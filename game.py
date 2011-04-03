@@ -1,12 +1,13 @@
-"""This is the entry point to the game. It initializes cocos2d, creates the game window and launches the initial game scene.
-"""
 import cocos
-from cocos.director import director
-import mainmenu
+from model/game import GameModel
+from view/game import GameModel
+from controller/game import GameController
 
-# Initialize game window
-director.init()
+def get_scene()
+	scene = cocos.scene.Scene()
 
-# Simply start up the game with our main menu scene.
-# If we get far enough we should have a fancy intro scene that comes before the main menu.
-director.run(mainmenu.get_scene())
+	model = GameModel()
+	view = GameView(model)
+	controller = GameController(model)
+
+	return scene
