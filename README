@@ -1,14 +1,22 @@
-UNTITLED GAME
--------------
+Nonagon
+-------
 Authors:
 David Thompson, Steven Karrmann, Nathan Yelle
 
 License:
 GPL or BSD? pyglet and cocos2d use BSD... so does that mean we have to use BSD or can we use the GPL?
 
-Description:
-<description goes here>
-This game was created during the April 2011 Pyweek competition. The theme chosen for this competition is "Nine Times".
+Description: (Work in progess)
+
+Nonagon is a geometric 2D side-scrolling shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator.
+
+The player's ammunition comes in the form of symmetric transformations on regular polygons. A randomly-generated queue of such transformations is visible at the bottom of the game screen. When the player presses the fire button, the first transformation in the queue is removed, and a projectile is fired. If this projectile hits an enemy polygon, the aforementioned transformation is applied to it. The player defeats enemy polygons by transforming them into specific orientations.
+
+The enemy polygons fire projectiles at the player. If these projectiles hit the player, or if the player collides with an enemy polygon, he or she loses a life.
+
+The player wins the game by defeating all enemy polygons. The player loses when he or she runs out of lives.
+
+Nonagon was created during the April 2011 Pyweek competition. The theme chosen for this competition is "Nine Times".
 
 Dependencies:
 pyglet, cocos2d
