@@ -1,0 +1,15 @@
+HACKING GUIDE
+-------------
+To create a new game scene:
+This project uses the model-view-controller(http://en.wikipedia.org/wiki/Model-view-controller) pattern to separate game logic and input from it's core state and visual representation.
+Models contain the game state that will be accessed by both the View and the Controller such as the game map and the objects on it. Models inherit from the pyglet.event.EventDispatcher class to provide an interface for Controllers and Views to react to changes in game state.
+Views use the data stored in a model to draw the scene to the screen. Views shouldn't alter game state. Views inherit from cocos.layer.Layer.
+Controllers alter the game state by responding to user/AI input. Controllers inherit from cocos.layer.Layer.
+For each game scene, 4 python source files must be created.
+For example, let's say we want to make a Main Menu scene. The following files need to be created:
+model/mainmenu.py
+view/mainmenu.py
+controller/mainmenu.py
+mainmenu.py
+The first 3 should be self explanatory.
+The final source file resides in the project's root directory and should simply contain one function called "get_scene". This function is responsible for piecing together the Model, View, and Controller and doing any initial processing that needs to be done. A cocos.scene.Scene object should be returned.
