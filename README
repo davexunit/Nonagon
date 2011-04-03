@@ -1,6 +1,20 @@
 UNTITLED GAME
 -------------
-Authors: David Thompson, Steven Karrmann, Nathan Yelle
-Description: <WRITE ME>
-Installing: <WRITE ME>
-Controls: <WRITE ME>
+Authors:
+David Thompson, Steven Karrmann, Nathan Yelle
+
+License:
+GPL or BSD? pyglet and cocos2d use BSD... so does that mean we have to use BSD or can we use the GPL?
+
+Description:
+<description goes here>
+This game was created during the April 2011 Pyweek competition. The theme chosen for this competition is "Nine Times".
+
+Dependencies:
+pyglet, cocos2d
+
+Running:
+<WRITE ME>
+
+Controls:
+<WRITE ME>
