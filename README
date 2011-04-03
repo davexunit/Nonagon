@@ -14,7 +14,8 @@ Dependencies:
 pyglet, cocos2d
 
 Running:
-<WRITE ME>
+python game.py
+(For now, we'll need to actually package this before the end of Pyweek. :P)
 
 Controls:
 <WRITE ME>
