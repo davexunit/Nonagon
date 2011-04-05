@@ -57,14 +57,14 @@ class %sController(cocos.layer.Layer):\n\
 view.close()
 
 # Create root level file
-root_filename = '%s.py' % module_name
+root_filename = 'get%s.py' % module_name
 print 'Creating %s' % root_filename
 check(root_filename)
 root = open(root_filename, 'w')
 root.write('import cocos\n\
-from model/%s import %sModel\n\
-from view/%s import %sView\n\
-from controller/%s import %sController\n\n\
+from model.%s import %sModel\n\
+from view.%s import %sView\n\
+from controller.%s import %sController\n\n\
 def get_scene():\n\
 	scene = cocos.scene.Scene()\n\n\
 	model = %sModel()\n\

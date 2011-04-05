@@ -1,4 +1,15 @@
 TODO LIST
 ---------
+<<<<<<< HEAD
 [ ] Figure out what our game will be. :P
 [ ] Have Nate NOT be a useless piece of derp that can't connect to git & irc while not on campus!
+=======
+[ ] Create polygon representation class
+[ ] Create enemy art
+[ ] Create player art
+[ ] Create sound effects/music
+[ ] Create level format
+[ ] Create level designs
+[ ] Make the main menu interesting
+[ ] Create a functional demo!
+>>>>>>> origin/master
