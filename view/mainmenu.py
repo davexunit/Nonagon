@@ -1,3 +1,4 @@
+import random
 import pyglet
 import cocos
 from cocos.director import director
@@ -15,11 +16,41 @@ class MainMenuView(cocos.layer.ColorLayer):
 		# Our super awesome logo
 		self.logo = cocos.sprite.Sprite('logo.png')
 		w, h = director.get_window_size()
-		self.logo.position = w / 2, h - 10 - self.logo.height / 2
+		# Position our logo somewhere nice.
+		self.logo.position = w / 2, h - 100 - self.logo.height / 2
+		# Make some sprites float around the screen.
+		self.batch = cocos.batch.BatchNode()
+		self.sprites = []
+		images = ['rotate_cw.png', 'nonagon.png']
+		
+		for i in range(30):
+			sprite = cocos.sprite.Sprite(images[random.randint(0, 1)])
+			sprite.position = random.randint(0, w), random.randint(0, h)
+			sprite.dx = random.randint(150, 300)
+			sprite.dy = random.randint(150, 300)
+			self.batch.add(sprite)
+			self.sprites.append(sprite)
+
 		# Add our menu
+		self.add(self.batch)
 		self.add(MainMenu())
 		self.add(self.logo)
 
+		self.schedule(self.step)
+
+	def step(self, dt):
+		w, h = director.get_window_size()
+		for s in self.sprites:
+			s.x += s.dx * dt
+			s.y += s.dy * dt
+
+			if s.x > w + s.width / 2:
+				s.x = -s.width / 2
+			if s.y > h + s.height / 2:
+				s.y = -s.height / 2
+
+# This is a layout strategy function for the MainMenu class.
+# This is copied from the cocos2d source code and modified to provide padding inbetween menu options.
 def paddedVerticalLayout(padding):
 	def betterVerticalLayout(menu):
 		width, height = director.get_window_size()
@@ -65,6 +96,10 @@ class MainMenu(Menu):
 		self.font_item_selected['font_name'] = 'Orbitron'
 		self.font_item_selected['font_size'] = 32
 		self.font_item_selected['color'] = (50, 50, 50, 255)
+		# Alter margin
+		self.menu_vmargin = 100
+		# Align vertically at the bottom of the screen.
+		self.menu_valign = 'bottom'
 		# Create the menu items
 		items = []
 		items.append(MenuItem('Play', self.on_play))
@@ -75,6 +110,7 @@ class MainMenu(Menu):
 		self.create_menu(items, layout_strategy=paddedVerticalLayout(10))
 	
 	def on_play(self):
+		# Launch game scene.
 		import getgame
 		director.push(getgame.get_scene())
 	
