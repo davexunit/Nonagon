@@ -6,11 +6,15 @@ David Thompson, Steven Karrmann, Nathan Yelle
 License:
 GPL or BSD? pyglet and cocos2d use BSD... so does that mean we have to use BSD or can we use the GPL?
 
-Description: (Work in progess)
+Description:
 
-Nonagon is a geometric 2D side-scrolling shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator.
+Nonagon is a geometric 2D side-scrolling vertical shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator. The player strives to destroy these polygons, but the task requires some geometric trickery.
 
-The player's ammunition comes in the form of symmetric transformations on regular polygons. A randomly-generated queue of such transformations is visible at the bottom of the game screen. When the player presses the fire button, the first transformation in the queue is removed, and a projectile is fired. If this projectile hits an enemy polygon, the aforementioned transformation is applied to it. The player defeats enemy polygons by transforming them into specific orientations.
+The player has two kinds of guns: transformation and damage. The transformation gun is used to change the orientation of enemy polygons, and the damage gun is used to destroy them.
+
+The enemy polygons are oriented so that a single vertex is facing the player. Each polygon has a "killing vertex", and an enemy polygon can only be damaged when this killing vertex is facing the player. The player uses his transformation gun to bring the killing vertex to the front. To make this task more challenging, a player cannot perform the same transformation twice in a row.
+
+When an enemy's killing vertex is facing the player, a shot by the damage gun will kill the enemy. However, shooting the damage gun at an enemy whose killing vertex is not facing the player will merely infuriate the enemy, and cause it retaliate with a storm of projectiles.
 
 The enemy polygons fire projectiles at the player. If these projectiles hit the player, or if the player collides with an enemy polygon, he or she loses a life.
 
@@ -26,4 +30,11 @@ python game.py
 (For now, we'll need to actually package this before the end of Pyweek. :P)
 
 Controls:
-<WRITE ME>
+Move spaceship			Arrow keys
+Fire transformation gun:
+  Rotate counter-clockwise	A
+  Rotate clockwise		S
+  Flip about line L		Q
+  Flip about line R		W
+Fire damage gun:  		D
+Pause game			Enter
