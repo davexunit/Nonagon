@@ -35,7 +35,8 @@ class MainMenu(Menu):
 		self.create_menu(items)
 	
 	def on_play(self):
-		pass
+		import getgame
+		print getgame
 	
 	def on_options(self):
 		pass

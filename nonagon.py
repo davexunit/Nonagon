@@ -3,7 +3,7 @@
 import cocos
 from cocos.director import director
 import pyglet
-import mainmenu
+import getmainmenu
 
 # Tell pyglet where our game resources are located
 pyglet.resource.path.append('media')
@@ -11,7 +11,8 @@ pyglet.resource.reindex()
 
 # Initialize game window
 director.init()
+director.show_FPS = True
 
 # Simply start up the game with our main menu scene.
 # If we get far enough we should have a fancy intro scene that comes before the main menu.
-director.run(mainmenu.get_scene())
+director.run(getmainmenu.get_scene())
