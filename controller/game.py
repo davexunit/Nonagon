@@ -9,6 +9,15 @@ class GameController(cocos.layer.Layer):
 		super(GameController, self).__init__()
 		self.model = model
 		self.schedule(self.step)
+		
+		# Weapon key assignments; QWERTY for now
+		self.rotate_ccw = key.Q
+		self.rotate_cw = key.W
+		self.flip_l = key.E
+		self.flip_r = key.R
+		self.fire = key.T
+
+		self.last_transf = ''
 
 	def on_key_press(self, symbol, modifiers):
 		if symbol == key.LEFT:
@@ -19,6 +28,25 @@ class GameController(cocos.layer.Layer):
 			self.model.player.move(Movable.MOVE_UP)
 		elif symbol == key.DOWN:
 			self.model.player.move(Movable.MOVE_DOWN)
+		elif symbol == self.rotate_ccw:
+			if self.last_transf != self.rotate_ccw:
+				self.last_transf = self.rotate_ccw
+				print 'rotate ccw'
+		elif symbol == self.rotate_cw:
+			if self.last_transf != self.rotate_cw:
+				self.last_transf = self.rotate_cw
+				print 'rotate cw'
+		elif symbol == self.flip_l:
+			if self.last_transf != self.flip_l:
+				self.last_transf = self.flip_l
+				print 'flip l'
+		elif symbol == self.flip_r:
+			if self.last_transf != self.flip_r:
+				self.last_transf = self.flip_r
+				print 'flip r'
+		elif symbol == self.fire:
+			print 'fire'
+				
 	
 	def on_key_release(self, symbol, modifiers):
 		if symbol == key.LEFT:
