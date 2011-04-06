@@ -2,7 +2,12 @@
 """
 import cocos
 from cocos.director import director
+import pyglet
 import mainmenu
+
+# Tell pyglet where our game resources are located
+pyglet.resource.path.append('media')
+pyglet.resource.reindex()
 
 # Initialize game window
 director.init()

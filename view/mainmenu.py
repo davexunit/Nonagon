@@ -11,15 +11,20 @@ class MainMenuView(cocos.layer.Layer):
 		"""
 		super(MainMenuView, self).__init__()
 		self.model = model
+		# Our super awesome logo
+		self.logo = cocos.sprite.Sprite('logo.png')
+		w, h = director.get_window_size()
+		self.logo.position = w / 2, h - 10 - self.logo.height / 2
 		# Add our menu
 		self.add(MainMenu())
+		self.add(self.logo)
 
 class MainMenu(Menu):
 	"""Defines the style and options available in the main menu.
 	It's ugly that this is in the view module because we define some game logic here based upon what option the user chooses but there's not much we can do about that.
 	"""
 	def __init__(self):
-		super(MainMenu, self).__init__('Tine Nimes')
+		super(MainMenu, self).__init__('')
 		# Create the menu items
 		items = []
 		items.append(MenuItem('Play', self.on_play))
