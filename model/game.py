@@ -17,10 +17,63 @@ class GameModel(pyglet.event.EventDispatcher):
 			#self.testpoly.flip_l()
 			self.testpoly.flip_r()
 		self.testpoly.do((cocos.actions.Delay(1) + cocos.actions.CallFunc(stuff)) * 10)
+		self.player = Player()
+		self.player.position = 400, 300
+	
+	def step(self, dt):
+		"""Called every frame, this method updates objects that have time dependent calculations to perform.
+		"""
+		self.player.step(dt)
 
-class EnemyPolygon(cocos.cocosnode.CocosNode):
+class Movable(object):
+	""" Provides movement functionality for game objects.
+	"""
+	# Fuck yeah bit masks!
+	MOVE_LEFT = 1
+	MOVE_RIGHT = 2
+	MOVE_UP = 4
+	MOVE_DOWN = 8
+
+	def __init__(self, speed):
+		self.speed = speed
+		self.move_mask = 0
+
+	def move(self, direction):
+		self.move_mask |= direction
+	
+	def stop_move(self, direction):
+		self.move_mask &= ~direction
+
+	def step(self, dt):
+		dx = 0
+		dy = 0
+
+		if self.move_mask & self.MOVE_LEFT:
+			dx = -self.speed * dt
+		if self.move_mask & self.MOVE_RIGHT:
+			dx = self.speed * dt
+		if self.move_mask & self.MOVE_UP:
+			dy = self.speed * dt
+		if self.move_mask & self.MOVE_DOWN:
+			dy = -self.speed * dt
+
+		self.x += dx
+		self.y += dy	
+
+class Player(cocos.sprite.Sprite, Movable):
+	"""Our courageous player!
+	"""
+	def __init__(self):
+		cocos.sprite.Sprite.__init__(self, 'ship.png')
+		Movable.__init__(self, 500)
+
+class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
+	"""Our polygon adversary.
+	"""
 	def __init__(self, num_vertices, x_pos, y_pos):
-		super(EnemyPolygon, self).__init__()
+		#super(EnemyPolygon, self).__init__()
+		cocos.cocosnode.CocosNode.__init__(self)
+		Movable.__init__(self, 400)
 		self.num_vertices = num_vertices
 		self.x = x_pos
 		self.y = y_pos

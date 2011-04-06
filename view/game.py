@@ -6,3 +6,4 @@ class GameView(cocos.layer.ColorLayer):
 		self.model = model
 
 		self.add(self.model.testpoly)
+		self.add(self.model.player)
