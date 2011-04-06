@@ -10,7 +10,13 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Create a batch for faster rendering awesomeness.
 		self.batch = cocos.batch.BatchNode()
 		# Testing out the polygon class.
-		self.testpoly = EnemyPolygon(5, 100, 100)
+		self.testpoly = EnemyPolygon(5, 200, 200)
+		def stuff():
+			#self.testpoly.rotate_cw()
+			#self.testpoly.rotate_ccw()
+			#self.testpoly.flip_l()
+			self.testpoly.flip_r()
+		self.testpoly.do((cocos.actions.Delay(1) + cocos.actions.CallFunc(stuff)) * 10)
 
 class EnemyPolygon(cocos.cocosnode.CocosNode):
 	def __init__(self, num_vertices, x_pos, y_pos):
@@ -57,9 +63,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		glBegin(GL_LINE_LOOP)
 		for i in range(self.num_vertices):
 			angle = 2 * math.pi * i / self.num_vertices - math.pi / 2
-			glVertex3f(radius * math.cos(angle),
-				   radius * math.sin(angle),
-				   0)
+			glVertex2f(radius * math.cos(angle), radius * math.sin(angle))
 		glEnd()
 
 		# Draw kill vertex indicator
@@ -67,13 +71,16 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		glColor3f(1.0, 0.0, 0.0) # Red color
 		angle = 2 * math.pi * self.kill_vertex / self.num_vertices - math.pi / 2
 		kv_ind_x = radius * math.cos(angle)
-		kv_ind_y = radius * math.cos(angle)
+		kv_ind_y = radius * math.sin(angle)
+		glPushMatrix()
+		glTranslatef(kv_ind_x, kv_ind_y, 0)
 		glBegin(GL_QUADS)
-		glVertex2f(kv_ind_x, kv_ind_y)
-		glVertex2f(kv_ind_x, kv_ind_y + kv_ind_size)
-		glVertex2f(kv_ind_x + kv_ind_size, kv_ind_y + kv_ind_size)
-		glVertex2f(kv_ind_x + kv_ind_size, kv_ind_y)
+		glVertex2f(-kv_ind_size, -kv_ind_size)
+		glVertex2f(-kv_ind_size, kv_ind_size)
+		glVertex2f(kv_ind_size, kv_ind_size)
+		glVertex2f(kv_ind_size, -kv_ind_size)
 		glEnd()
+		glPopMatrix()
 		#glRect(kv_ind_x - kv_ind_size, kv_ind_y - kv_ind_size,
 		#	   kv_ind_x + kv_ind_size, kv_ind_y + kv_ind_size)
 		glPopMatrix()
