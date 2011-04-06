@@ -15,8 +15,11 @@
    id="svg2985"
    version="1.1"
    inkscape:version="0.48.1 r9760"
-   sodipodi:docname="nonagon-logo.svg"
-   style="enable-background:new">
+   sodipodi:docname="logo.svg"
+   style="enable-background:new"
+   inkscape:export-filename="/home/dave/code/PyweekWSU/media/logo.png"
+   inkscape:export-xdpi="71.000732"
+   inkscape:export-ydpi="71.000732">
   <defs
      id="defs2987">
     <linearGradient
@@ -36,16 +39,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.70710678"
-     inkscape:cx="717.55871"
+     inkscape:cx="467.24291"
      inkscape:cy="-105.18672"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="flowRoot3076"
      inkscape:document-units="px"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="949"
+     inkscape:window-width="1278"
+     inkscape:window-height="783"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-y="15"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true"
      fit-margin-top="5"
@@ -60,6 +63,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -181,7 +185,7 @@
        id="flowRoot3076">
       <path
          d="m 105.3965,208.84205 21.6,0 0,-104.976 -21.6,0 0,71.424 -41.616,-71.424 -22.176,0 0,104.976 21.6,0 0,-72.576 42.192,72.576"
-         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold"
+         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977000000072px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold;fill:#323232;fill-opacity:1"
          id="path3006"
          inkscape:connector-curvature="0" />
       <path
@@ -191,7 +195,7 @@
          inkscape:connector-curvature="0" />
       <path
          d="m 346.8765,208.84205 21.6,0 0,-104.976 -21.6,0 0,71.424 -41.616,-71.424 -22.176,0 0,104.976 21.6,0 0,-72.576 42.192,72.576"
-         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold"
+         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977000000072px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold;fill:#323232;fill-opacity:1"
          id="path3010"
          inkscape:connector-curvature="0" />
       <path
@@ -201,7 +205,7 @@
          inkscape:connector-curvature="0" />
       <path
          d="m 609.28149,152.39405 -42.048,0 0,18 23.904,0 c -0.576,5.90399 -2.016,9.504 -5.184,13.248 -5.18399,6.33599 -13.10401,10.08 -21.456,10.08 -17.42398,0 -29.952,-15.26402 -29.952,-36.864 0,-22.60798 11.08802,-36.288 29.376,-36.288 7.48799,0 13.82401,2.16 18.576,6.336 3.024,2.592 4.608,5.04 6.48,10.512 l 20.304,0 c -2.592,-21.59998 -20.16002,-35.28 -45.504,-35.28 -30.23997,0 -50.832,22.32003 -50.832,55.008 0,31.82397 20.73603,55.008 49.104,55.008 14.11199,0 23.61601,-5.04001 31.68,-16.848 l 2.592,13.824 12.96,0 0,-56.736"
-         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold"
+         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977000000072px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold;fill:#323232;fill-opacity:1"
          id="path3014"
          inkscape:connector-curvature="0" />
       <path
@@ -211,7 +215,7 @@
          inkscape:connector-curvature="0" />
       <path
          d="m 829.8365,208.84205 21.6,0 0,-104.976 -21.6,0 0,71.424 -41.616,-71.424 -22.176,0 0,104.976 21.6,0 0,-72.576 42.192,72.576"
-         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold"
+         style="font-size:144px;font-weight:bold;letter-spacing:12.73999977000000072px;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold;fill:#323232;fill-opacity:1"
          id="path3018"
          inkscape:connector-curvature="0" />
     </g>
