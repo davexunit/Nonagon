@@ -10,4 +10,7 @@ def get_scene():
 	view = GameView(model)
 	controller = GameController(model)
 
+	scene.add(view)
+	scene.add(controller)
+
 	return scene

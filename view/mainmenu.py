@@ -91,10 +91,10 @@ class MainMenu(Menu):
 		super(MainMenu, self).__init__('')
 		# Menu item font properties
 		self.font_item['font_name'] = 'Orbitron'
-		self.font_item['font_size'] = 24
+		#self.font_item['font_size'] = 24
 		self.font_item['color'] = (0, 0, 0, 255)
 		self.font_item_selected['font_name'] = 'Orbitron'
-		self.font_item_selected['font_size'] = 32
+		#self.font_item_selected['font_size'] = 32
 		self.font_item_selected['color'] = (50, 50, 50, 255)
 		# Alter margin
 		self.menu_vmargin = 100
