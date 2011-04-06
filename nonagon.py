@@ -6,11 +6,12 @@ import pyglet
 import getmainmenu
 
 # Tell pyglet where our game resources are located
-pyglet.resource.path.append('media')
+pyglet.resource.path.append('media/images')
 pyglet.resource.reindex()
+pyglet.font.add_directory('media/fonts')
 
 # Initialize game window
-director.init()
+director.init(width=800, height=600)
 director.show_FPS = True
 
 # Simply start up the game with our main menu scene.

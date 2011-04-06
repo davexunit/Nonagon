@@ -1,3 +1,10 @@
 TODO LIST
 ---------
-[ ] Figure out what our game will be. :P
+[ ] Create polygon representation class
+[ ] Create enemy art
+[ ] Create player art
+[ ] Create sound effects/music
+[ ] Create level format
+[ ] Create level designs
+[ ] Make the main menu interesting
+[ ] Create a functional demo!
