@@ -9,24 +9,14 @@ class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
 		# Testing out the polygon class.
-		self.testpoly = EnemyPolygon(5)
-		self.testpoly.position = 200, 200
-		self.testpolys = cocos.cocosnode.CocosNode()
+		self.enemies = cocos.cocosnode.CocosNode()
 		
 		# Just testing all the different enemy types
 		for v in range(3, 9):
 			poly = EnemyPolygon(v)
 			poly.position = (v - 2) * 100, 500
-			self.testpolys.add(poly)
+			self.enemies.add(poly)
 			
-		# Just a test to try out operations
-		def stuff():
-			self.testpoly.rotate_cw()
-			#self.testpoly.rotate_ccw()
-			#self.testpoly.flip_l()
-			#self.testpoly.flip_r()
-		self.testpoly.do((cocos.actions.Delay(1) + cocos.actions.CallFunc(stuff)) * 30)
-
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
@@ -41,11 +31,16 @@ class GameModel(pyglet.event.EventDispatcher):
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
+		# Some inefficient naive collision detection
 		for b in self.player_bullets.get_children():
-			for e in self.testpolys.get_children():
+			for e in self.enemies.get_children():
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
+		if not self.player.no_clip:
+			for e in self.enemies.get_children():
+				if self.player.get_rect().intersects(e.get_rect()):
+					self.player.on_hit()
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
@@ -150,6 +145,7 @@ class Player(cocos.sprite.Sprite):
 		w, h = director.get_window_size()
 		self.do(cocos.actions.move_actions.BoundedMove(w, h))
 		self.velocity = 0, 0
+		self.no_clip = False
 
 	def move(self, direction):
 		self.move_mask |= direction
@@ -173,6 +169,12 @@ class Player(cocos.sprite.Sprite):
 			dy = -self.speed
 
 		self.velocity = (dx, dy)
+	
+	def on_hit(self):
+		def func():
+			self.no_clip = False
+		self.no_clip = True
+		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
 
 class EnemyPolygon(cocos.cocosnode.CocosNode):
 	"""Our polygonal adversary.
@@ -180,10 +182,13 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 	def __init__(self, num_vertices):
 		super(EnemyPolygon, self).__init__()
 		self.num_vertices = num_vertices
+		# Maximum number of transforms to expose a kill vertex in the worst case is floor(n / 2)
+		# We're dealing with ints so no need to floor the value
+		self.max_hits = self.num_vertices / 2
 		# The more vertices, the bigger the polygon
 		self.increment = 5
 		self.base_size = 10
-		self.radius = self.base_size + self.num_vertices * self.increment
+		self.radius = 30#self.base_size + self.num_vertices * self.increment
 		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
 		self.no = cocos.sprite.Sprite('no.png')
 		self.yes = cocos.sprite.Sprite('yes.png')

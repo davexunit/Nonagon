@@ -11,11 +11,11 @@ class GameController(cocos.layer.Layer):
 		self.schedule(self.step)
 		
 		# Weapon key assignments; QWERTY for now
-		self.rotate_ccw = key.Z
-		self.rotate_cw = key.X
+		self.rotate_ccw = key.X
+		self.rotate_cw = key.Z
 		self.flip_l = key.C
 		self.flip_r = key.V
-		self.fire = key.SPACE
+		self.fire_key = key.SPACE
 
 		self.last_transf = ''
 
@@ -29,23 +29,15 @@ class GameController(cocos.layer.Layer):
 		elif symbol == key.DOWN:
 			self.model.player.move(Player.MOVE_DOWN)
 		elif symbol == self.rotate_ccw:
-			if self.last_transf != self.rotate_ccw:
-				self.last_transf = self.rotate_ccw
 			self.model.fire_player_bullet(RotateCCWBullet())
 		elif symbol == self.rotate_cw:
-			if self.last_transf != self.rotate_cw:
-				self.last_transf = self.rotate_cw
 			self.model.fire_player_bullet(RotateCWBullet())
 		elif symbol == self.flip_l:
-			if self.last_transf != self.flip_l:
-				self.last_transf = self.flip_l
 			self.model.fire_player_bullet(FlipLeftBullet())
 		elif symbol == self.flip_r:
-			if self.last_transf != self.flip_r:
-				self.last_transf = self.flip_r
 			self.model.fire_player_bullet(FlipRightBullet())
-		elif symbol == self.fire:
-			self.model.fire_player_bullet(KillBullet())
+		elif symbol == self.fire_key:
+			self.start_fire()
 	
 	def on_key_release(self, symbol, modifiers):
 		if symbol == key.LEFT:
@@ -56,6 +48,17 @@ class GameController(cocos.layer.Layer):
 			self.model.player.stop_move(Player.MOVE_UP)
 		elif symbol == key.DOWN:
 			self.model.player.stop_move(Player.MOVE_DOWN)
+		elif symbol == self.fire_key:
+			self.stop_fire()
+	
+	def start_fire(self):
+		self.model.player.schedule_interval(self.fire, .1)
+	
+	def stop_fire(self):
+		self.model.player.unschedule(self.fire)
+	
+	def fire(self, dt):
+		self.model.fire_player_bullet(KillBullet())
 	
 	def step(self, dt):
 		self.model.step(dt)
