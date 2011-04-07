@@ -1,6 +1,6 @@
 import cocos
 from pyglet.window import key
-from model.game import Movable, RotateCWBullet
+from model.game import *
 
 class GameController(cocos.layer.Layer):
 	is_event_handler = True
@@ -21,44 +21,41 @@ class GameController(cocos.layer.Layer):
 
 	def on_key_press(self, symbol, modifiers):
 		if symbol == key.LEFT:
-			self.model.player.move(Movable.MOVE_LEFT)
+			self.model.player.move(Player.MOVE_LEFT)
 		elif symbol == key.RIGHT:
-			self.model.player.move(Movable.MOVE_RIGHT)
+			self.model.player.move(Player.MOVE_RIGHT)
 		elif symbol == key.UP:
-			self.model.player.move(Movable.MOVE_UP)
+			self.model.player.move(Player.MOVE_UP)
 		elif symbol == key.DOWN:
-			self.model.player.move(Movable.MOVE_DOWN)
+			self.model.player.move(Player.MOVE_DOWN)
 		elif symbol == self.rotate_ccw:
 			if self.last_transf != self.rotate_ccw:
 				self.last_transf = self.rotate_ccw
-				print 'rotate ccw'
+				self.model.fire_player_bullet(RotateCCWBullet())
 		elif symbol == self.rotate_cw:
 			if self.last_transf != self.rotate_cw:
 				self.last_transf = self.rotate_cw
-				bullet = RotateCWBullet()
-				bullet.position = self.model.player.position
-				self.model.player_bullets.add(bullet)
+				self.model.fire_player_bullet(RotateCWBullet())
 		elif symbol == self.flip_l:
 			if self.last_transf != self.flip_l:
 				self.last_transf = self.flip_l
-				print 'flip l'
+				self.model.fire_player_bullet(FlipLeftBullet())
 		elif symbol == self.flip_r:
 			if self.last_transf != self.flip_r:
 				self.last_transf = self.flip_r
-				print 'flip r'
+				self.model.fire_player_bullet(FlipRightBullet())
 		elif symbol == self.fire:
-			print 'fire'
-				
+			self.model.fire_player_bullet(KillBullet())
 	
 	def on_key_release(self, symbol, modifiers):
 		if symbol == key.LEFT:
-			self.model.player.stop_move(Movable.MOVE_LEFT)
+			self.model.player.stop_move(Player.MOVE_LEFT)
 		elif symbol == key.RIGHT:
-			self.model.player.stop_move(Movable.MOVE_RIGHT)
+			self.model.player.stop_move(Player.MOVE_RIGHT)
 		elif symbol == key.UP:
-			self.model.player.stop_move(Movable.MOVE_UP)
+			self.model.player.stop_move(Player.MOVE_UP)
 		elif symbol == key.DOWN:
-			self.model.player.stop_move(Movable.MOVE_DOWN)
+			self.model.player.stop_move(Player.MOVE_DOWN)
 	
 	def step(self, dt):
 		self.model.step(dt)

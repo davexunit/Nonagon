@@ -20,34 +20,20 @@ class MainMenuView(cocos.layer.ColorLayer):
 		self.logo.position = w / 2, h - 100 - self.logo.height / 2
 		# Make some sprites float around the screen.
 		self.batch = cocos.batch.BatchNode()
-		self.sprites = []
 		images = ['rotate_cw.png', 'nonagon.png']
 		
+		# Create 30 sprites, choosing randomly between the 2 images specified.
 		for i in range(30):
 			sprite = cocos.sprite.Sprite(images[random.randint(0, 1)])
 			sprite.position = random.randint(0, w), random.randint(0, h)
-			sprite.dx = random.randint(150, 300)
-			sprite.dy = random.randint(150, 300)
+			sprite.velocity = random.randint(150, 300), random.randint(150, 300)
+			sprite.do(cocos.actions.move_actions.WrappedMove(w, h))
 			self.batch.add(sprite)
-			self.sprites.append(sprite)
 
 		# Add our menu
 		self.add(self.batch)
 		self.add(MainMenu())
 		self.add(self.logo)
-
-		self.schedule(self.step)
-
-	def step(self, dt):
-		w, h = director.get_window_size()
-		for s in self.sprites:
-			s.x += s.dx * dt
-			s.y += s.dy * dt
-
-			if s.x > w + s.width / 2:
-				s.x = -s.width / 2
-			if s.y > h + s.height / 2:
-				s.y = -s.height / 2
 
 # This is a layout strategy function for the MainMenu class.
 # This is copied from the cocos2d source code and modified to provide padding inbetween menu options.

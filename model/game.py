@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
 import cocos
+from cocos.director import director
 import math
 import random
 
@@ -33,12 +34,31 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Node for player bullets
 		self.player_bullets = cocos.batch.BatchNode()
 	
+	def fire_player_bullet(self, bullet):
+		bullet.position = self.player.position
+		self.player_bullets.add(bullet)
+
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
-		self.player.step(dt)
-		for b in self.player_bullets.children:
-			b[1].step(dt)
+		pass
+
+class RemoveBoundedMove(cocos.actions.move_actions.Move):
+	"""Move the target but remove it from the parent when it reaches certain bounds.
+	Modified from the cocos2d sources to fit the needed purpose.
+	"""
+	def init(self, width, height):
+		self.width, self.height = width, height
+
+	def step(self, dt):
+		super(RemoveBoundedMove, self).step(dt)
+		x, y = self.target.position
+		w, h = self.target.width, self.target.height
+		# Out of bounds, remove the node from the parent
+		if x > self.width + w/2 or x < 0 - w/2 or y > self.height + h/2 or y < 0 - h/2:
+			self.target.parent.remove(self.target)
+
+		self.target.position = (x, y)
 
 class Bullet(cocos.sprite.Sprite):
 	"""Provides the functionality to create differing bullet types by using event handlers.
@@ -47,8 +67,9 @@ class Bullet(cocos.sprite.Sprite):
 		"""dx and dy parameters set the bullet speed and vector.
 		"""
 		super(Bullet, self).__init__(image_file)
-		self.dx = dx
-		self.dy = dy
+		self.velocity = dx, dy
+		w, h = director.get_window_size()
+		self.do(RemoveBoundedMove(w, h))
 	
 	def step(self, dt):
 		self.x += self.dx * dt
@@ -69,8 +90,47 @@ class RotateCWBullet(Bullet):
 	def on_hit(self, entity):
 		entity.rotate_cw()
 
-class Movable(object):
-	""" Provides movement functionality for game objects.
+class RotateCCWBullet(Bullet):
+	"""Bullet that will rotate an enemy's kill vertex one 'step' counter clockwise.
+	"""
+	def __init__(self):
+		super(RotateCCWBullet, self).__init__('rotate_ccw_bullet.png')
+	
+	def on_hit(self, entity):
+		entity.rotate_ccw()
+		
+class FlipLeftBullet(Bullet):
+	"""Bullet that will flip an enemy by it's left axis of symmetry.
+	"""
+	def __init__(self):
+		super(FlipLeftBullet, self).__init__('flip_left_bullet.png')
+	
+	def on_hit(self, entity):
+		entity.flip_l()
+
+class FlipRightBullet(Bullet):
+	"""Bullet that will flip an enemy by it's right axis of symmetry.
+	"""
+	def __init__(self):
+		super(FlipRightBullet, self).__init__('flip_right_bullet.png')
+	
+	def on_hit(self, entity):
+		entity.flip_r()
+
+class KillBullet(Bullet):
+	"""Bullet that will kill an enemy that has its kill vertex exposed.
+	"""
+	def __init__(self):
+		super(KillBullet, self).__init__('bullet.png')
+	
+	def on_hit(self, entity):
+		if entity.kill_vertex == 0:
+			print "KILL"
+		else:
+			print "NOPE"
+
+class Player(cocos.sprite.Sprite):
+	""" Our courageous hero!
 	"""
 	# Fuck yeah bit masks!
 	MOVE_LEFT = 1
@@ -78,46 +138,42 @@ class Movable(object):
 	MOVE_UP = 4
 	MOVE_DOWN = 8
 
-	def __init__(self, speed):
-		self.speed = speed
+	def __init__(self):
+		cocos.sprite.Sprite.__init__(self, 'ship.png')
 		self.move_mask = 0
+		self.speed = 500
+		w, h = director.get_window_size()
+		self.do(cocos.actions.move_actions.BoundedMove(w, h))
+		self.velocity = 0, 0
 
 	def move(self, direction):
 		self.move_mask |= direction
+		self.update_velocity()
 	
 	def stop_move(self, direction):
 		self.move_mask &= ~direction
-
-	def step(self, dt):
+		self.update_velocity()
+	
+	def update_velocity(self):
 		dx = 0
 		dy = 0
 
 		if self.move_mask & self.MOVE_LEFT:
-			dx = -self.speed * dt
+			dx = -self.speed
 		if self.move_mask & self.MOVE_RIGHT:
-			dx = self.speed * dt
+			dx = self.speed
 		if self.move_mask & self.MOVE_UP:
-			dy = self.speed * dt
+			dy = self.speed
 		if self.move_mask & self.MOVE_DOWN:
-			dy = -self.speed * dt
+			dy = -self.speed
 
-		self.x += dx
-		self.y += dy	
+		self.velocity = (dx, dy)
 
-class Player(cocos.sprite.Sprite, Movable):
-	"""Our courageous player!
-	"""
-	def __init__(self):
-		cocos.sprite.Sprite.__init__(self, 'ship.png')
-		Movable.__init__(self, 500)
-
-class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
+class EnemyPolygon(cocos.cocosnode.CocosNode):
 	"""Our polygonal adversary.
 	"""
 	def __init__(self, num_vertices):
-		#super(EnemyPolygon, self).__init__()
-		cocos.cocosnode.CocosNode.__init__(self)
-		Movable.__init__(self, 400)
+		super(EnemyPolygon, self).__init__()
 		self.num_vertices = num_vertices
 		# The more vertices, the bigger the polygon
 		self.increment = 5
