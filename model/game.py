@@ -7,16 +7,26 @@ import random
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
-		# Create a batch for faster rendering awesomeness.
-		self.batch = cocos.batch.BatchNode()
 		# Testing out the polygon class.
-		self.testpoly = EnemyPolygon(5, 200, 200)
+		self.testpoly = EnemyPolygon(5)
+		self.testpoly.position = 200, 200
+		self.testpolys = cocos.cocosnode.CocosNode()
+		
+		# Just testing all the different enemy types
+		for v in range(3, 9):
+			poly = EnemyPolygon(v)
+			poly.position = (v - 2) * 100, 500
+			self.testpolys.add(poly)
+			
+		# Just a test to try out operations
 		def stuff():
-			#self.testpoly.rotate_cw()
+			self.testpoly.rotate_cw()
 			#self.testpoly.rotate_ccw()
 			#self.testpoly.flip_l()
-			self.testpoly.flip_r()
-		self.testpoly.do((cocos.actions.Delay(1) + cocos.actions.CallFunc(stuff)) * 10)
+			#self.testpoly.flip_r()
+		self.testpoly.do((cocos.actions.Delay(1) + cocos.actions.CallFunc(stuff)) * 30)
+
+		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
 	
@@ -68,38 +78,73 @@ class Player(cocos.sprite.Sprite, Movable):
 		Movable.__init__(self, 500)
 
 class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
-	"""Our polygon adversary.
+	"""Our polygonal adversary.
 	"""
-	def __init__(self, num_vertices, x_pos, y_pos):
+	def __init__(self, num_vertices):
 		#super(EnemyPolygon, self).__init__()
 		cocos.cocosnode.CocosNode.__init__(self)
 		Movable.__init__(self, 400)
 		self.num_vertices = num_vertices
-		self.x = x_pos
-		self.y = y_pos
+		# The more vertices, the bigger the polygon
+		self.increment = 5
+		self.radius = self.num_vertices * self.increment
+		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
+		self.no = cocos.sprite.Sprite('no.png')
+		self.yes = cocos.sprite.Sprite('yes.png')
+		# Enemy sprite
+		# TODO: This will be customized on a per-enemy basis
+		self.sprite = cocos.sprite.Sprite('enemy.png')
+		self.add(self.sprite)
 		
 		# Assign the kill vertex to a non-downward vertex. The polygon's
 		# downward vertex is zero, and the rest are numbered
 		# incrementally counter-clockwise from the downward vertex.
-		self.kill_vertex = random.randrange(1, num_vertices)
+		self.kill_vertex = random.randrange(0, num_vertices)
+		self.update_sprites()
+
+	def update_sprites(self):
+		"""Sets the correct sprites based upon the kill vertex.
+		"""
+		if self.kill_vertex == 0:
+			# This is a bit of a hack... it's just not pretty. It works, though.
+			# Catch element not found exceptions
+			try:
+				self.remove(self.no)
+			except:
+				pass
+			self.add(self.yes)
+			angle = 2 * math.pi * self.kill_vertex / self.num_vertices - math.pi / 2
+			self.yes.position = self.radius * math.cos(angle), self.radius * math.sin(angle)
+		else:
+			try:
+				self.remove(self.yes)
+			except:
+				pass
+			self.add(self.no)
+			angle = 2 * math.pi * self.kill_vertex / self.num_vertices - math.pi / 2
+			self.no.position = self.radius * math.cos(angle), self.radius * math.sin(angle)
 
 	# Rotate clockwise
 	def rotate_cw(self):
 		self.kill_vertex = (self.kill_vertex - 1) % self.num_vertices
+		self.update_sprites()
 
 	# Rotate counter-clockwise
 	def rotate_ccw(self):
 		self.kill_vertex = (self.kill_vertex + 1) % self.num_vertices
+		self.update_sprites()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the left of the downward vertex
 	def flip_l(self):
 		self.kill_vertex = (-self.kill_vertex - 1) % self.num_vertices
+		self.update_sprites()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the right of the downward vertex
 	def flip_r(self):
 		self.kill_vertex = (-self.kill_vertex + 1) % self.num_vertices
+		self.update_sprites()
 
 	# Need to work out the OpenGL/pyglet vertex buffer business here, but
 	# here's a sketch for how we can draw the polygon and its
@@ -108,23 +153,29 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
 		glPushMatrix()
 		self.transform()
 		# Draw polygon
-		radius = 100 # 'Radius' of polygon
-		glColor3f(0.0, 0.0, 0.5) # Dark blue color
+		#glColor3f(0.0, 0.0, 0.5) # Dark blue color
+		if self.kill_vertex != 0:
+			glColor3f(1.0, 0.0, 0.0) # red color
+		else:
+			glColor3f(0.0, 1.0, 0.0)
+		glLineWidth(4)
+		glEnable(GL_LINE_SMOOTH)
 		# Construct polygon by its vertices, starting with the
 		# downward vertex and working counter-clockwise
 		# TODO: Put this stuff in a vertex buffer
 		glBegin(GL_LINE_LOOP)
 		for i in range(self.num_vertices):
 			angle = 2 * math.pi * i / self.num_vertices - math.pi / 2
-			glVertex2f(radius * math.cos(angle), radius * math.sin(angle))
+			glVertex2f(self.radius * math.cos(angle), self.radius * math.sin(angle))
 		glEnd()
 
 		# Draw kill vertex indicator
-		kv_ind_size = 5 # Size of kill vertex indicator
+		# TODO: This should be a child node
+		'''kv_ind_size = 5 # Size of kill vertex indicator
 		glColor3f(1.0, 0.0, 0.0) # Red color
 		angle = 2 * math.pi * self.kill_vertex / self.num_vertices - math.pi / 2
-		kv_ind_x = radius * math.cos(angle)
-		kv_ind_y = radius * math.sin(angle)
+		kv_ind_x = self.radius * math.cos(angle)
+		kv_ind_y = self.radius * math.sin(angle)
 		glPushMatrix()
 		glTranslatef(kv_ind_x, kv_ind_y, 0)
 		glBegin(GL_QUADS)
@@ -133,8 +184,6 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
 		glVertex2f(kv_ind_size, kv_ind_size)
 		glVertex2f(kv_ind_size, -kv_ind_size)
 		glEnd()
-		glPopMatrix()
-		#glRect(kv_ind_x - kv_ind_size, kv_ind_y - kv_ind_size,
-		#	   kv_ind_x + kv_ind_size, kv_ind_y + kv_ind_size)
+		glPopMatrix()'''
 		glPopMatrix()
 	
