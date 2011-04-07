@@ -41,7 +41,10 @@ class GameModel(pyglet.event.EventDispatcher):
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
-		pass
+		for b in self.player_bullets.get_children():
+			for e in self.testpolys.get_children():
+				if b.get_rect().intersects(e.get_rect()):
+					print 'hit'
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
