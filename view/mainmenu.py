@@ -89,7 +89,7 @@ class MainMenu(Menu):
 		# Create the menu items
 		items = []
 		items.append(MenuItem('Play', self.on_play))
-		items.append(MenuItem('Options', self.on_options))
+		items.append(MenuItem('Instructions', self.on_options))
 		items.append(MenuItem('Quit', self.on_quit))
 
 		# Finalize the menu
