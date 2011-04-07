@@ -31,19 +31,19 @@ class GameController(cocos.layer.Layer):
 		elif symbol == self.rotate_ccw:
 			if self.last_transf != self.rotate_ccw:
 				self.last_transf = self.rotate_ccw
-				self.model.fire_player_bullet(RotateCCWBullet())
+			self.model.fire_player_bullet(RotateCCWBullet())
 		elif symbol == self.rotate_cw:
 			if self.last_transf != self.rotate_cw:
 				self.last_transf = self.rotate_cw
-				self.model.fire_player_bullet(RotateCWBullet())
+			self.model.fire_player_bullet(RotateCWBullet())
 		elif symbol == self.flip_l:
 			if self.last_transf != self.flip_l:
 				self.last_transf = self.flip_l
-				self.model.fire_player_bullet(FlipLeftBullet())
+			self.model.fire_player_bullet(FlipLeftBullet())
 		elif symbol == self.flip_r:
 			if self.last_transf != self.flip_r:
 				self.last_transf = self.flip_r
-				self.model.fire_player_bullet(FlipRightBullet())
+			self.model.fire_player_bullet(FlipRightBullet())
 		elif symbol == self.fire:
 			self.model.fire_player_bullet(KillBullet())
 	

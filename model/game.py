@@ -44,7 +44,8 @@ class GameModel(pyglet.event.EventDispatcher):
 		for b in self.player_bullets.get_children():
 			for e in self.testpolys.get_children():
 				if b.get_rect().intersects(e.get_rect()):
-					print 'hit'
+					b.on_hit(e)
+					self.player_bullets.remove(b)
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
@@ -129,6 +130,7 @@ class KillBullet(Bullet):
 	def on_hit(self, entity):
 		if entity.kill_vertex == 0:
 			print "KILL"
+			entity.parent.remove(entity)
 		else:
 			print "NOPE"
 
@@ -195,6 +197,11 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		# incrementally counter-clockwise from the downward vertex.
 		self.kill_vertex = random.randrange(0, num_vertices)
 		self.update_sprites()
+	
+	def get_rect(self):
+		rect = self.sprite.get_rect()
+		rect.center = self.position
+		return rect
 
 	def update_sprites(self):
 		"""Sets the correct sprites based upon the kill vertex.
