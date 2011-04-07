@@ -4,11 +4,15 @@ import cocos
 from cocos.director import director
 import math
 import random
+import level
 
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
 		# Testing out the polygon class.
+		
+
+		"""
 		self.enemies = cocos.cocosnode.CocosNode()
 		
 		# Just testing all the different enemy types
@@ -16,6 +20,9 @@ class GameModel(pyglet.event.EventDispatcher):
 			poly = EnemyPolygon(v)
 			poly.position = (v - 2) * 100, 500
 			self.enemies.add(poly)
+		"""
+
+		self.wave = level.Wave([(3, None), (4, None), (5, None)])
 			
 		# Add the player
 		self.player = Player()
@@ -40,12 +47,12 @@ class GameModel(pyglet.event.EventDispatcher):
 		"""
 		# Some inefficient naive collision detection
 		for b in self.player_bullets.get_children():
-			for e in self.enemies.get_children():
+			for e in self.wave.get_children():
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
 		if not self.player.no_clip:
-			for e in self.enemies.get_children():
+			for e in self.wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
 
