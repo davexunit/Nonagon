@@ -23,6 +23,13 @@ class GameModel(pyglet.event.EventDispatcher):
 		
 		# Node for player bullets
 		self.player_bullets = cocos.batch.BatchNode()
+
+		# Register player event listeners
+		self.player.push_handlers(self)
+	
+	def on_game_over(self):
+		import getgameover
+		director.replace(getgameover.get_scene())
 	
 	def fire_player_bullet(self, bullet):
 		bullet.position = self.player.position
@@ -146,6 +153,7 @@ class Player(cocos.sprite.Sprite):
 		self.do(cocos.actions.move_actions.BoundedMove(w, h))
 		self.velocity = 0, 0
 		self.no_clip = False
+		self.lives = 3
 
 	def move(self, direction):
 		self.move_mask |= direction
@@ -175,6 +183,11 @@ class Player(cocos.sprite.Sprite):
 			self.no_clip = False
 		self.no_clip = True
 		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
+		self.lives -= 1
+		if self.lives == 0:
+			self.dispatch_event('on_game_over')
+
+Player.register_event_type('on_game_over')
 
 class EnemyPolygon(cocos.cocosnode.CocosNode):
 	"""Our polygonal adversary.
