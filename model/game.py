@@ -2,20 +2,19 @@ import pyglet
 from pyglet.gl import *
 import cocos
 from cocos.director import director
+from cocos.actions import *
 import math
 import random
+import level
 
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
-		# Testing out the polygon class.
-		self.enemies = cocos.cocosnode.CocosNode()
-		
-		# Just testing all the different enemy types
-		for v in range(3, 9):
-			poly = EnemyPolygon(v)
-			poly.position = (v - 2) * 100, 500
-			self.enemies.add(poly)
+
+		# Testing wave class
+		self.wave = level.Wave([(3, None), (4, None), (5, None)])
+		for e in self.wave.get_children():
+			e.push_handlers(self)
 			
 		# Add the player
 		self.player = Player()
@@ -23,24 +22,47 @@ class GameModel(pyglet.event.EventDispatcher):
 		
 		# Node for player bullets
 		self.player_bullets = cocos.batch.BatchNode()
+		
+		# Node for enemy bullets
+		self.enemy_bullets = cocos.batch.BatchNode()
+
+		# Register player event listeners
+		self.player.push_handlers(self)
+	
+	def on_game_over(self):
+		import getgameover
+		director.replace(getgameover.get_scene())
 	
 	def fire_player_bullet(self, bullet):
 		bullet.position = self.player.position
 		self.player_bullets.add(bullet)
+
+	def on_player_fire(self, bullet):
+		self.player_bullets.add(bullet)
+
+	def on_enemy_fire(self, bullet):
+		self.enemy_bullets.add(bullet)
 
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
 		# Some inefficient naive collision detection
 		for b in self.player_bullets.get_children():
-			for e in self.enemies.get_children():
+			for e in self.wave.get_children():
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
+					return
 		if not self.player.no_clip:
-			for e in self.enemies.get_children():
+			for e in self.wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
+					return
+			for b in self.enemy_bullets.get_children():
+				if b.get_rect().intersects(self.player.get_rect()):
+					b.on_hit(self.player)
+					self.enemy_bullets.remove(b)
+					return
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
@@ -124,10 +146,17 @@ class KillBullet(Bullet):
 	
 	def on_hit(self, entity):
 		if entity.kill_vertex == 0:
-			print "KILL"
 			entity.parent.remove(entity)
-		else:
-			print "NOPE"
+
+class EnemyBullet(Bullet):
+	"""Enemies fire these. Go figure.
+	"""
+	def __init__(self):
+		super(EnemyBullet, self).__init__('enemy_bullet.png', dy=-300)
+	
+	def on_hit(self, entity):
+		# Player loses a life
+		entity.lose_life()
 
 class Player(cocos.sprite.Sprite):
 	""" Our courageous hero!
@@ -146,6 +175,7 @@ class Player(cocos.sprite.Sprite):
 		self.do(cocos.actions.move_actions.BoundedMove(w, h))
 		self.velocity = 0, 0
 		self.no_clip = False
+		self.lives = 3
 
 	def move(self, direction):
 		self.move_mask |= direction
@@ -154,6 +184,10 @@ class Player(cocos.sprite.Sprite):
 	def stop_move(self, direction):
 		self.move_mask &= ~direction
 		self.update_velocity()
+	
+	def fire(self, bullet):
+		bullet.position = self.position
+		self.dispatch_event('on_player_fire', bullet)
 	
 	def update_velocity(self):
 		dx = 0
@@ -170,38 +204,64 @@ class Player(cocos.sprite.Sprite):
 
 		self.velocity = (dx, dy)
 	
-	def on_hit(self):
+	def lose_life(self):
 		def func():
 			self.no_clip = False
 		self.no_clip = True
 		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
+		self.lives -= 1
+		if self.lives == 0:
+			self.dispatch_event('on_game_over')
+	
+	def on_hit(self):
+		self.lose_life()
 
-class EnemyPolygon(cocos.cocosnode.CocosNode):
+Player.register_event_type('on_game_over')
+Player.register_event_type('on_player_fire')
+
+class EnemyWeapon(object):
+	"""Controls the pattern and rate with which the enemy fires bullets
+	"""
+	def __init__(self, enemy, interval):
+		self.enemy = enemy
+		def fire():
+			bullet = EnemyBullet()
+			bullet.position = self.enemy.position
+			self.enemy.dispatch_event('on_enemy_fire', bullet)
+		action = Repeat(Delay(2) + (CallFunc(fire) + Delay(.2)) * 3)
+		self.enemy.do(action)
+	
+	def fire(self, dt):
+		bullet = EnemyBullet()
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
+
+class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Our polygonal adversary.
 	"""
-	def __init__(self, num_vertices):
-		super(EnemyPolygon, self).__init__()
+	def __init__(self, num_vertices, radius=30, image_file='enemy.png'):
+		#super(EnemyPolygon, self).__init__()
+		cocos.cocosnode.CocosNode.__init__(self)
+		pyglet.event.EventDispatcher.__init__(self)
 		self.num_vertices = num_vertices
 		# Maximum number of transforms to expose a kill vertex in the worst case is floor(n / 2)
 		# We're dealing with ints so no need to floor the value
 		self.max_hits = self.num_vertices / 2
-		# The more vertices, the bigger the polygon
-		self.increment = 5
-		self.base_size = 10
-		self.radius = 30#self.base_size + self.num_vertices * self.increment
+		self.radius = radius
 		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
 		self.no = cocos.sprite.Sprite('no.png')
 		self.yes = cocos.sprite.Sprite('yes.png')
 		# Enemy sprite
 		# TODO: This will be customized on a per-enemy basis
-		self.sprite = cocos.sprite.Sprite('enemy.png')
+		self.sprite = cocos.sprite.Sprite(image_file)
 		self.add(self.sprite)
-		
 		# Assign the kill vertex to a non-downward vertex. The polygon's
 		# downward vertex is zero, and the rest are numbered
 		# incrementally counter-clockwise from the downward vertex.
 		self.kill_vertex = random.randrange(0, num_vertices)
 		self.update_sprites()
+		# Test weapon
+		self.weapon = EnemyWeapon(self, 1)
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
@@ -293,3 +353,4 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		glPopMatrix()'''
 		glPopMatrix()
 	
+EnemyPolygon.register_event_type('on_enemy_fire')
