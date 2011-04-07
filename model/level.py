@@ -22,6 +22,13 @@ class Wave(cocos.cocosnode.CocosNode):
 				action = cocos.actions.Bezier(path, 5)
 				enemy.do(action)
 
+	def remove(self, entity):
+		super(Wave, self).remove(entity)
+
+		# Check if wave is empty
+		if not self.get_children():
+			print "Wave complete!"
+
 class Level(cocos.cocosnode.CocosNode):
 	"""Contains many waves of enemies that the player must defeat.
 	"""
@@ -32,7 +39,9 @@ BEND_NONE = 0
 BEND_DOWN = 1
 BEND_UP = 2
 def create_enemy_path(enemy, x_dest, y_dest, bend):
-	"""DOCUMENT MEEEEEE!!!!
+	"""Creates a Bezier path for an enemy polygon. The path extends from
+	the enemy's current position to (x_dest, y_dest). bend determines
+	the basic curvature of the path.
 	"""
 	rel_start = (0,0)
 	rel_end = (x_dest-enemy.x, y_dest-enemy.y)
@@ -40,6 +49,7 @@ def create_enemy_path(enemy, x_dest, y_dest, bend):
 	rel_start_handle = rel_start
 	rel_end_handle = rel_end
 
+	# Adjust bend, depending on whether ship is moving up or down
 	if y_dest < enemy.y:
 		bend = (bend * 2) % 3
 
@@ -48,7 +58,7 @@ def create_enemy_path(enemy, x_dest, y_dest, bend):
 		rel_end_handle = (rel_end[0] - rel_start[0], rel_end[1])
 	elif bend == BEND_DOWN:
 		rel_start_handle = (rel_start[0] + rel_end[0], rel_start[1])
-	rel_end_handle = (rel_end[0] , rel_end[1] - rel_start[0])
+		rel_end_handle = (rel_end[0] , rel_end[1] - rel_start[0])
 
 	path = Bezier(rel_start, rel_end, rel_start_handle, rel_end_handle)
 
