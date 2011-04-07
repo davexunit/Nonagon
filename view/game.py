@@ -7,4 +7,5 @@ class GameView(cocos.layer.ColorLayer):
 
 		self.add(self.model.testpoly)
 		self.add(self.model.player)
+		self.add(self.model.player_bullets)
 		self.add(self.model.testpolys)

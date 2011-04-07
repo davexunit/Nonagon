@@ -29,11 +29,45 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
+		
+		# Node for player bullets
+		self.player_bullets = cocos.batch.BatchNode()
 	
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
 		self.player.step(dt)
+		for b in self.player_bullets.children:
+			b[1].step(dt)
+
+class Bullet(cocos.sprite.Sprite):
+	"""Provides the functionality to create differing bullet types by using event handlers.
+	"""
+	def __init__(self, image_file, dx=0, dy=500):
+		"""dx and dy parameters set the bullet speed and vector.
+		"""
+		super(Bullet, self).__init__(image_file)
+		self.dx = dx
+		self.dy = dy
+	
+	def step(self, dt):
+		self.x += self.dx * dt
+		self.y += self.dy * dt
+
+	def on_hit(self, entity):
+		"""Hit event handler.
+		Customize this to do what you want the bullet to do.
+		"""
+		pass
+
+class RotateCWBullet(Bullet):
+	"""Bullet that will rotate an enemy's kill vertex one 'step' clockwise.
+	"""
+	def __init__(self):
+		super(RotateCWBullet, self).__init__('rotate_cw_bullet.png')
+	
+	def on_hit(self, entity):
+		entity.rotate_cw()
 
 class Movable(object):
 	""" Provides movement functionality for game objects.
@@ -87,7 +121,8 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, Movable):
 		self.num_vertices = num_vertices
 		# The more vertices, the bigger the polygon
 		self.increment = 5
-		self.radius = self.num_vertices * self.increment
+		self.base_size = 10
+		self.radius = self.base_size + self.num_vertices * self.increment
 		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
 		self.no = cocos.sprite.Sprite('no.png')
 		self.yes = cocos.sprite.Sprite('yes.png')

@@ -1,6 +1,6 @@
 import cocos
 from pyglet.window import key
-from model.game import Movable
+from model.game import Movable, RotateCWBullet
 
 class GameController(cocos.layer.Layer):
 	is_event_handler = True
@@ -11,11 +11,11 @@ class GameController(cocos.layer.Layer):
 		self.schedule(self.step)
 		
 		# Weapon key assignments; QWERTY for now
-		self.rotate_ccw = key.Q
-		self.rotate_cw = key.W
-		self.flip_l = key.E
-		self.flip_r = key.R
-		self.fire = key.T
+		self.rotate_ccw = key.Z
+		self.rotate_cw = key.X
+		self.flip_l = key.C
+		self.flip_r = key.V
+		self.fire = key.SPACE
 
 		self.last_transf = ''
 
@@ -35,7 +35,9 @@ class GameController(cocos.layer.Layer):
 		elif symbol == self.rotate_cw:
 			if self.last_transf != self.rotate_cw:
 				self.last_transf = self.rotate_cw
-				print 'rotate cw'
+				bullet = RotateCWBullet()
+				bullet.position = self.model.player.position
+				self.model.player_bullets.add(bullet)
 		elif symbol == self.flip_l:
 			if self.last_transf != self.flip_l:
 				self.last_transf = self.flip_l
