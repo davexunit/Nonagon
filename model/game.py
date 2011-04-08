@@ -18,7 +18,8 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Testing wave class
 		def make_action(enemy):
 			path = level.create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, level.BEND_UP)
-			return  cocos.actions.Bezier(path, 5)
+			action = Bezier(path, 5)
+			return Repeat(action + MoveBy((-100, 150)))
 		def make_weapon(enemy):
 			return BasicEnemyWeapon(enemy, 1)
 		enemy1 = level.WaveEnemy(3, 1, make_action, make_weapon)
