@@ -14,9 +14,11 @@ class GameModel(pyglet.event.EventDispatcher):
 
 		# Testing wave class
 		wave1 = level.Wave([(3, None), (4, None), (5, None)])
-		self.level = level.Level([wave1])
+		wave2 = level.Wave([(3, None), (4, None), (5, None)])
+		self.level = level.Level([wave1, wave2])
 		for e in self.level.current_wave.get_children():
 			e.push_handlers(self)
+		self.level.push_handlers(self)
 			
 		# Add the player
 		self.player = Player()
@@ -30,6 +32,9 @@ class GameModel(pyglet.event.EventDispatcher):
 
 		# Register player event listeners
 		self.player.push_handlers(self)
+	
+	def on_level_complete(self):
+		print "Level complete"
 	
 	def on_lose_life(self, lives):
 		p = Explosion()
@@ -230,8 +235,10 @@ class Player(cocos.sprite.Sprite):
 		self.update_velocity()
 	
 	def fire(self, bullet):
-		bullet.position = self.position
-		self.dispatch_event('on_player_fire', bullet)
+		# The player cannot fire when no_clip is on
+		if not self.no_clip:
+			bullet.position = self.position
+			self.dispatch_event('on_player_fire', bullet)
 	
 	def update_velocity(self):
 		dx = 0

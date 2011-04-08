@@ -53,7 +53,7 @@ class GameController(cocos.layer.Layer):
 	
 	def start_fire(self):
 		self.fire(0)
-		self.model.player.schedule_interval(self.fire, .1)
+		self.model.player.schedule_interval(self.fire, .08)
 	
 	def stop_fire(self):
 		self.model.player.unschedule(self.fire)

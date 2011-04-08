@@ -4,7 +4,7 @@ from cocos.path import Bezier
 import game
 
 class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
-	"""Defines the type of enemies that appear in a level and defines their behavior.
+	"""Defines the type of enemies that appear in a level and their behavior.
 	"""
 	def __init__(self, enemy_list):
 		"""enemy_list is a list of (num_vertices, action) pairs.
@@ -25,26 +25,39 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 				enemy.do(action)
 
 	def on_enemy_death(self, enemy):
-		# Check if wave is empty
 		self.remove(enemy)
+		# Check if wave is empty
 		if not self.get_children():
 			self.dispatch_event('on_wave_complete', self)
 
 Wave.register_event_type('on_wave_complete')
 
-class Level(cocos.cocosnode.CocosNode):
+class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Contains many waves of enemies that the player must defeat.
 	"""
 	def __init__(self, wave_list):
 		super(Level,self).__init__()
 		# For testing purposes, only load first wave in wave_list
-		self.current_wave = wave_list[0]
+		self.wave_list = wave_list
+		self.next_wave()
+	
+	def next_wave(self):
+		# Dispatch level complete event and return when wave is finished.
+		if len(self.wave_list) == 0:
+			self.dispatch_event('on_level_complete')
+			return
+
+		# Pop wave off of list
+		self.current_wave = self.wave_list.pop()
+		# Push handlers
 		self.current_wave.push_handlers(self)
+		# Add to node
 		self.add(self.current_wave)
 
 	def on_wave_complete(self, wave):
-		print "Wave complete!"
-		
+		self.next_wave()
+
+Level.register_event_type('on_level_complete')
 				
 BEND_NONE = 0
 BEND_DOWN = 1
