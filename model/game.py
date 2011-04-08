@@ -9,19 +9,8 @@ import level
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
-		# Testing out the polygon class.
-		
 
-		"""
-		self.enemies = cocos.cocosnode.CocosNode()
-		
-		# Just testing all the different enemy types
-		for v in range(3, 10):
-			poly = EnemyPolygon(v)
-			poly.position = (v - 2) * 100, 500
-			self.enemies.add(poly)
-		"""
-
+		# Testing wave class
 		self.wave = level.Wave([(3, None), (4, None), (5, None)])
 			
 		# Add the player
@@ -30,6 +19,9 @@ class GameModel(pyglet.event.EventDispatcher):
 		
 		# Node for player bullets
 		self.player_bullets = cocos.batch.BatchNode()
+		
+		# Node for enemy bullets
+		self.enemy_bullets = cocos.batch.BatchNode()
 
 		# Register player event listeners
 		self.player.push_handlers(self)
@@ -42,6 +34,12 @@ class GameModel(pyglet.event.EventDispatcher):
 		bullet.position = self.player.position
 		self.player_bullets.add(bullet)
 
+	def on_player_fire(self, bullet):
+		self.player_bullets.add(bullet)
+
+	def on_enemy_fire(self, bullet):
+		self.enemy_bullets.add(bullet)
+
 	def step(self, dt):
 		"""Called every frame, this method updates objects that have time dependent calculations to perform.
 		"""
@@ -51,10 +49,12 @@ class GameModel(pyglet.event.EventDispatcher):
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
+					return
 		if not self.player.no_clip:
 			for e in self.wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
+					return
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
@@ -195,6 +195,17 @@ class Player(cocos.sprite.Sprite):
 			self.dispatch_event('on_game_over')
 
 Player.register_event_type('on_game_over')
+Player.register_event_type('on_player_fire')
+
+class EnemyWeapon(object):
+	"""Controls the pattern and rate with which the enemy fires bullets
+	"""
+	def __init__(self, enemy, interval):
+		self.enemy = enemy
+		self.schedule_interval(self.fire, interval)
+	
+	def fire(self, dt):
+		pass
 
 class EnemyPolygon(cocos.cocosnode.CocosNode):
 	"""Our polygonal adversary.
