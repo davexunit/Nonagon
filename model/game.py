@@ -3,6 +3,7 @@ from pyglet.gl import *
 import cocos
 from cocos.director import director
 from cocos.actions import *
+from cocos.particle_systems import Explosion
 import math
 import random
 import level
@@ -20,19 +21,25 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
-		
 		# Node for player bullets
 		self.player_bullets = cocos.batch.BatchNode()
-		
 		# Node for enemy bullets
 		self.enemy_bullets = cocos.batch.BatchNode()
+		# Node for particles
+		self.particles = cocos.cocosnode.CocosNode()
 
 		# Register player event listeners
 		self.player.push_handlers(self)
 	
-	def on_game_over(self):
-		import getgameover
-		director.replace(getgameover.get_scene(self.player.score))
+	def on_lose_life(self, lives):
+		p = Explosion()
+		p.position = self.player.position
+		self.particles.add(p)
+		w, h = director.get_window_size()
+		self.player.position = w/2, h/2
+		if lives == 0:
+			import getgameover
+			director.replace(getgameover.get_scene(self.player.score))
 
 	def on_bad_transform(self, enemy):
 		self.player.chain = 0
@@ -40,6 +47,9 @@ class GameModel(pyglet.event.EventDispatcher):
 	def on_enemy_death(self, enemy):
 		self.player.chain += 1
 		self.player.score += enemy.num_vertices * 10
+		p = Explosion()
+		p.position = enemy.position
+		self.particles.add(p)
 
 	def on_player_fire(self, bullet):
 		self.player_bullets.add(bullet)
@@ -244,13 +254,12 @@ class Player(cocos.sprite.Sprite):
 		self.no_clip = True
 		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
 		self.lives -= 1
-		if self.lives == 0:
-			self.dispatch_event('on_game_over')
+		self.dispatch_event('on_lose_life', self.lives)
 	
 	def on_hit(self):
 		self.lose_life()
 
-Player.register_event_type('on_game_over')
+Player.register_event_type('on_lose_life')
 Player.register_event_type('on_chain_change')
 Player.register_event_type('on_lives_change')
 Player.register_event_type('on_score_change')

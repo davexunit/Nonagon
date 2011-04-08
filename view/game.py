@@ -19,13 +19,18 @@ class GameView(cocos.layer.ColorLayer):
 
 		self.model.player.push_handlers(self)
 
-		self.add(self.model.player)
-		self.add(self.model.player_bullets)
-		self.add(self.model.enemy_bullets)
-		self.add(self.model.level)
-		self.add(self.lives, z=1)
-		self.add(self.score, z=1)
-		self.add(self.chain, z=1)
+		self.add(self.model.player, z=5)
+		self.add(self.model.player_bullets, z=3)
+		self.add(self.model.enemy_bullets, z=2)
+		self.add(self.model.level, z=4)
+		self.add(self.model.particles, z=6)
+		self.add(self.lives, z=10)
+		self.add(self.score, z=10)
+		self.add(self.chain, z=10)
+	
+	def on_lose_life(self, lives):
+		if lives == 0:
+			self.remove(self.model.player)
 	
 	def on_chain_change(self, chain):
 		self.chain.element.text = 'Chain: %d' % chain

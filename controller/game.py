@@ -11,10 +11,10 @@ class GameController(cocos.layer.Layer):
 		self.schedule(self.step)
 		
 		# Weapon key assignments; QWERTY for now
-		self.rotate_ccw = key.X
-		self.rotate_cw = key.Z
-		self.flip_l = key.C
-		self.flip_r = key.V
+		self.rotate_cw = key.A
+		self.rotate_ccw = key.S
+		self.flip_l = key.D
+		self.flip_r = key.F
 		self.fire_key = key.SPACE
 
 		self.last_transf = ''
