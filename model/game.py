@@ -34,8 +34,9 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.player.push_handlers(self)
 	
 	def on_level_complete(self):
-		print "Level complete"
-	
+		import getvictory
+		director.replace(getvictory.get_scene(self.player.score))
+
 	def on_lose_life(self, lives):
 		p = Explosion()
 		p.position = self.player.position
@@ -422,6 +423,10 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.do(cocos.actions.CallFunc(shield_up) + Delay(3) + cocos.actions.CallFunc(shield_down))
 		self.dispatch_event('on_bad_transform', self)
 
+	# Manage the death of the enemy polygon
+	def kill(self):
+		self.dispatch_event('on_enemy_death', self)
+
 	def draw(self):
 		glPushMatrix()
 		self.transform()
@@ -443,10 +448,6 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			glVertex2f(self.radius * math.cos(angle), self.radius * math.sin(angle))
 		glEnd()
 		glPopMatrix()
-
-	# Manage the death of the enemy polygon
-	def kill(self):
-		self.dispatch_event('on_enemy_death', self)
 	
 EnemyPolygon.register_event_type('on_enemy_fire')
 EnemyPolygon.register_event_type('on_enemy_death')
