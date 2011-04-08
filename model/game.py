@@ -392,6 +392,15 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.no_shield = True
 		# Counts the amount of transformation bullets that have hit.
 		self.num_transforms = 0
+		# Opacity
+		self._opacity = 255
+	
+	def _get_opacity(self):
+		return self._opacity
+	def _set_opacity(self, opacity):
+		self._opacity = opacity
+		self.sprite.opacity = opacity
+	opacity = property(_get_opacity, lambda self, opacity: self._set_opacity(opacity))
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
@@ -479,11 +488,11 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.transform()
 		# Draw polygon
 		if not self.no_shield:
-			glColor3f(0.0, 0.0, 1.0)
+			glColor4f(0.0, 0.0, 1.0, self.opacity / 255.0)
 		elif self.kill_vertex != 0:
-			glColor3f(1.0, 0.0, 0.0) # red color
+			glColor4f(1.0, 0.0, 0.0, self.opacity / 255.0) # red color
 		else:
-			glColor3f(0.0, 1.0, 0.0)
+			glColor4f(0.0, 1.0, 0.0, self.opacity / 255.0)
 		glLineWidth(3)
 		glEnable(GL_LINE_SMOOTH)
 		# Construct polygon by its vertices, starting with the

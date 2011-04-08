@@ -1,9 +1,9 @@
 import pyglet
 import cocos
+from cocos.actions import *
 from cocos.path import Bezier
 import game
 from collections import deque
-import copy
 
 class WaveEnemy(object):
 	"""This class contains the components that will make up an enemy in the wave.
@@ -21,6 +21,8 @@ class WaveEnemy(object):
 			enemy.do(self.action_callback(enemy))
 		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
 		pyglet.clock.schedule_once(do_action, 0)
+		# Fade in because it looks nicer than something just popping into existance
+		enemy.do(FadeIn(1))
 		return enemy
 
 def horizontalLayout(y):
