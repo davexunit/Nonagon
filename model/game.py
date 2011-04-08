@@ -267,6 +267,13 @@ class Player(cocos.sprite.Sprite):
 		self.dispatch_event('on_score_change', self._score)
 	score = property(_get_score, lambda self,score: self._set_score(score))
 
+	def get_rect(self):
+		rect = super(Player, self).get_rect()
+		rect.width -= 20
+		rect.height -= 20
+		rect.center = self.x, self.y
+		return rect
+
 	def move(self, direction):
 		self.move_mask |= direction
 		self.update_velocity()
@@ -363,7 +370,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	FLIP_L = 3
 	FLIP_R = 4
 
-	def __init__(self, num_vertices, kill_vertex, radius=30, image_file='enemy.png'):
+	def __init__(self, num_vertices, kill_vertex, radius=35, image_file='enemy1_ship.png'):
 		#super(EnemyPolygon, self).__init__()
 		cocos.cocosnode.CocosNode.__init__(self)
 		pyglet.event.EventDispatcher.__init__(self)
@@ -404,6 +411,8 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
+		rect.width -= 10
+		rect.height -= 10
 		rect.center = self.position
 		return rect
 	
