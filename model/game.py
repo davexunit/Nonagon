@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 import cocos
 from cocos.director import director
+from cocos.actions import *
 import math
 import random
 import level
@@ -223,7 +224,12 @@ class EnemyWeapon(object):
 	"""
 	def __init__(self, enemy, interval):
 		self.enemy = enemy
-		self.enemy.schedule_interval(self.fire, interval)
+		def fire():
+			bullet = EnemyBullet()
+			bullet.position = self.enemy.position
+			self.enemy.dispatch_event('on_enemy_fire', bullet)
+		action = Repeat(Delay(2) + (CallFunc(fire) + Delay(.2)) * 3)
+		self.enemy.do(action)
 	
 	def fire(self, dt):
 		bullet = EnemyBullet()
