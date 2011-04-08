@@ -12,6 +12,8 @@ class GameModel(pyglet.event.EventDispatcher):
 
 		# Testing wave class
 		self.wave = level.Wave([(3, None), (4, None), (5, None)])
+		for e in self.wave.get_children():
+			e.push_handlers(self)
 			
 		# Add the player
 		self.player = Player()
@@ -54,6 +56,11 @@ class GameModel(pyglet.event.EventDispatcher):
 			for e in self.wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
+					return
+			for b in self.enemy_bullets.get_children():
+				if b.get_rect().intersects(self.player.get_rect()):
+					b.on_hit(self.player)
+					self.enemy_bullets.remove(b)
 					return
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
@@ -138,10 +145,17 @@ class KillBullet(Bullet):
 	
 	def on_hit(self, entity):
 		if entity.kill_vertex == 0:
-			print "KILL"
 			entity.parent.remove(entity)
-		else:
-			print "NOPE"
+
+class EnemyBullet(Bullet):
+	"""Enemies fire these. Go figure.
+	"""
+	def __init__(self):
+		super(EnemyBullet, self).__init__('enemy_bullet.png', dy=-300)
+	
+	def on_hit(self, entity):
+		# Player loses a life
+		entity.lose_life()
 
 class Player(cocos.sprite.Sprite):
 	""" Our courageous hero!
@@ -170,6 +184,10 @@ class Player(cocos.sprite.Sprite):
 		self.move_mask &= ~direction
 		self.update_velocity()
 	
+	def fire(self, bullet):
+		bullet.position = self.position
+		self.dispatch_event('on_player_fire', bullet)
+	
 	def update_velocity(self):
 		dx = 0
 		dy = 0
@@ -185,7 +203,7 @@ class Player(cocos.sprite.Sprite):
 
 		self.velocity = (dx, dy)
 	
-	def on_hit(self):
+	def lose_life(self):
 		def func():
 			self.no_clip = False
 		self.no_clip = True
@@ -193,6 +211,9 @@ class Player(cocos.sprite.Sprite):
 		self.lives -= 1
 		if self.lives == 0:
 			self.dispatch_event('on_game_over')
+	
+	def on_hit(self):
+		self.lose_life()
 
 Player.register_event_type('on_game_over')
 Player.register_event_type('on_player_fire')
@@ -202,16 +223,20 @@ class EnemyWeapon(object):
 	"""
 	def __init__(self, enemy, interval):
 		self.enemy = enemy
-		self.schedule_interval(self.fire, interval)
+		self.enemy.schedule_interval(self.fire, interval)
 	
 	def fire(self, dt):
-		pass
+		bullet = EnemyBullet()
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
 
-class EnemyPolygon(cocos.cocosnode.CocosNode):
+class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Our polygonal adversary.
 	"""
 	def __init__(self, num_vertices, radius=30, image_file='enemy.png'):
-		super(EnemyPolygon, self).__init__()
+		#super(EnemyPolygon, self).__init__()
+		cocos.cocosnode.CocosNode.__init__(self)
+		pyglet.event.EventDispatcher.__init__(self)
 		self.num_vertices = num_vertices
 		# Maximum number of transforms to expose a kill vertex in the worst case is floor(n / 2)
 		# We're dealing with ints so no need to floor the value
@@ -224,12 +249,13 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		# TODO: This will be customized on a per-enemy basis
 		self.sprite = cocos.sprite.Sprite(image_file)
 		self.add(self.sprite)
-		
 		# Assign the kill vertex to a non-downward vertex. The polygon's
 		# downward vertex is zero, and the rest are numbered
 		# incrementally counter-clockwise from the downward vertex.
 		self.kill_vertex = random.randrange(0, num_vertices)
 		self.update_sprites()
+		# Test weapon
+		self.weapon = EnemyWeapon(self, 1)
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
@@ -321,3 +347,4 @@ class EnemyPolygon(cocos.cocosnode.CocosNode):
 		glPopMatrix()'''
 		glPopMatrix()
 	
+EnemyPolygon.register_event_type('on_enemy_fire')

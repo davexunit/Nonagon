@@ -29,13 +29,13 @@ class GameController(cocos.layer.Layer):
 		elif symbol == key.DOWN:
 			self.model.player.move(Player.MOVE_DOWN)
 		elif symbol == self.rotate_ccw:
-			self.model.fire_player_bullet(RotateCCWBullet())
+			self.model.player.fire(RotateCCWBullet())
 		elif symbol == self.rotate_cw:
-			self.model.fire_player_bullet(RotateCWBullet())
+			self.model.player.fire(RotateCWBullet())
 		elif symbol == self.flip_l:
-			self.model.fire_player_bullet(FlipLeftBullet())
+			self.model.player.fire(FlipLeftBullet())
 		elif symbol == self.flip_r:
-			self.model.fire_player_bullet(FlipRightBullet())
+			self.model.player.fire(FlipRightBullet())
 		elif symbol == self.fire_key:
 			self.start_fire()
 	
