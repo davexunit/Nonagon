@@ -16,12 +16,14 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.levels = deque()
 		self.current_level = None
 		# Testing wave class
-		wave1 = level.Wave([(3, None), (4, None), (5, None)])
-		wave2 = level.Wave([(4, None), (5, None)])
-		level1 = level.Level([wave1, wave2])
+		wave0 = level.Wave([(3, None)])
+		wave1 = level.Wave([(3, None), (3, None), (3, None)])
+		wave2 = level.Wave([(3, None), (4, None), (5, None), (3, None)])
+		level1 = level.Level([wave0, wave1, wave2])
 		wave3 = level.Wave([(6, None), (6, None), (6, None)])
 		wave4 = level.Wave([(7, None), (8, None)])
 		level2 = level.Level([wave3, wave4])
+		self.levels.append(level1)
 		self.levels.append(level2)
 			
 		# Add the player
