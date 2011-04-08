@@ -16,7 +16,7 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			vertex_count, enemy_action = enemy_tuple
 			enemy = game.EnemyPolygon(vertex_count)
 			enemy.push_handlers(self)
-			enemy.position =  w/len(enemy_list)*(i+0.5), h-100
+			enemy.position =  w/len(enemy_list)*(i+0.25), h-100
 			self.add(enemy)
 			if enemy_action != None:
 				enemy.do(enemy_action)
