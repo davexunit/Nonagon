@@ -1,7 +1,6 @@
 import pyglet
 import cocos
 from cocos.actions import *
-from cocos.path import Bezier
 import game
 from collections import deque
 
@@ -118,7 +117,26 @@ def create_enemy_path(enemy, x_dest, y_dest, bend):
 		rel_start_handle = (rel_start[0] + rel_end[0], rel_start[1])
 		rel_end_handle = (rel_end[0] , rel_end[1] - rel_start[0])
 
-	path = Bezier(rel_start, rel_end, rel_start_handle, rel_end_handle)
+	path = cocos.path.Bezier(rel_start, rel_end, rel_start_handle, rel_end_handle)
 
 	return path
 
+def get_levels():
+	"""Woo hoo we're hardcoding all of our levels here!
+	"""
+	levels = deque()
+	def make_action(enemy):
+		path = create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, BEND_UP)
+		action = Bezier(path, 5)
+		return Repeat(action + MoveBy((-100, 150)))
+	def make_weapon(enemy):
+		return game.BasicEnemyWeapon(enemy, 1)
+	enemy1 = WaveEnemy(3, 1, make_action, make_weapon)
+	enemy2 = WaveEnemy(5, 3, make_action, make_weapon)
+	wave0 = Wave(horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
+	wave1 = Wave(horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
+	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
+	level1 = Level([wave0, wave1, wave2])
+	levels.append(level1)
+
+	return levels

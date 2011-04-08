@@ -13,27 +13,9 @@ class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
 
-		self.levels = deque()
+		self.levels = level.get_levels()
 		self.current_level = None
-		# Testing wave class
-		def make_action(enemy):
-			path = level.create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, level.BEND_UP)
-			action = Bezier(path, 5)
-			return Repeat(action + MoveBy((-100, 150)))
-		def make_weapon(enemy):
-			return BasicEnemyWeapon(enemy, 1)
-		enemy1 = level.WaveEnemy(3, 1, make_action, make_weapon)
-		enemy2 = level.WaveEnemy(5, 3, make_action, make_weapon)
-		wave0 = level.Wave(level.horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
-		wave1 = level.Wave(level.horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
-		wave2 = level.Wave(level.horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
-		level1 = level.Level([wave0, wave1, wave2])
-		#wave3 = level.Wave([(6, None), (6, None), (6, None)])
-		#wave4 = level.Wave([(7, None), (8, None)])
-		#level2 = level.Level([wave3, wave4])
-		self.levels.append(level1)
-		#self.levels.append(level2)
-			
+		
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
