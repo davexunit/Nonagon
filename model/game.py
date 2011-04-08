@@ -38,6 +38,8 @@ class GameModel(pyglet.event.EventDispatcher):
 
 		# Register player event listeners
 		self.player.push_handlers(self)
+
+	def on_next_wave(self):
 	
 	def next_level(self):
 		# No levels left? WE HAVE A WINRAR!
