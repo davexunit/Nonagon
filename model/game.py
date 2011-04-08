@@ -12,7 +12,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.enemies = cocos.cocosnode.CocosNode()
 		
 		# Just testing all the different enemy types
-		for v in range(3, 9):
+		for v in range(3, 10):
 			poly = EnemyPolygon(v)
 			poly.position = (v - 2) * 100, 500
 			self.enemies.add(poly)
@@ -192,22 +192,19 @@ Player.register_event_type('on_game_over')
 class EnemyPolygon(cocos.cocosnode.CocosNode):
 	"""Our polygonal adversary.
 	"""
-	def __init__(self, num_vertices):
+	def __init__(self, num_vertices, radius=30, image_file='enemy.png'):
 		super(EnemyPolygon, self).__init__()
 		self.num_vertices = num_vertices
 		# Maximum number of transforms to expose a kill vertex in the worst case is floor(n / 2)
 		# We're dealing with ints so no need to floor the value
 		self.max_hits = self.num_vertices / 2
-		# The more vertices, the bigger the polygon
-		self.increment = 5
-		self.base_size = 10
-		self.radius = 30#self.base_size + self.num_vertices * self.increment
+		self.radius = radius
 		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
 		self.no = cocos.sprite.Sprite('no.png')
 		self.yes = cocos.sprite.Sprite('yes.png')
 		# Enemy sprite
 		# TODO: This will be customized on a per-enemy basis
-		self.sprite = cocos.sprite.Sprite('enemy.png')
+		self.sprite = cocos.sprite.Sprite(image_file)
 		self.add(self.sprite)
 		
 		# Assign the kill vertex to a non-downward vertex. The polygon's
