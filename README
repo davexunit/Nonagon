@@ -4,11 +4,10 @@ Authors:
 David Thompson, Steven Karrmann, Nathan Yelle
 
 License:
-GPL or BSD? pyglet and cocos2d use BSD... so does that mean we have to use BSD or can we use the GPL?
+GNU General Public License version 3
 
 Description:
-
-Nonagon is a geometric 2D side-scrolling vertical shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator. The player strives to destroy these polygons, but the task requires some geometric trickery.
+Nonagon is a geometric 2D vertical-scrolling shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator. The player strives to destroy these polygons, but the task requires some geometric trickery.
 
 The player has two kinds of guns: transformation and damage. The transformation gun is used to change the orientation of enemy polygons, and the damage gun is used to destroy them.
 
