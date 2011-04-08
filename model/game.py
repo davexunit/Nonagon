@@ -159,8 +159,8 @@ class KillBullet(Bullet):
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
 	"""
-	def __init__(self):
-		super(EnemyBullet, self).__init__('enemy_bullet.png', dy=-300)
+	def __init__(self, dx=0, dy=-500):
+		super(EnemyBullet, self).__init__('enemy_bullet.png', dx, dy)
 	
 	def on_hit(self, entity):
 		# Player loses a life
@@ -261,15 +261,37 @@ class EnemyWeapon(object):
 	"""
 	def __init__(self, enemy, interval):
 		self.enemy = enemy
-		def fire():
-			bullet = EnemyBullet()
-			bullet.position = self.enemy.position
-			self.enemy.dispatch_event('on_enemy_fire', bullet)
-		action = Repeat(Delay(2) + (CallFunc(fire) + Delay(.2)) * 3)
+		action = Repeat(Delay(2) + (CallFunc(self.fire) + Delay(.2)) * 3)
 		self.enemy.do(action)
 	
-	def fire(self, dt):
+	def fire(self):
+		pass
+
+class BasicEnemyWeapon(EnemyWeapon):
+	"""Fires bullets straight down
+	"""
+	def __init__(self, enemy, interval):
+		super(BasicEnemyWeapon, self).__init__(enemy, interval)
+	
+	def fire(self):
 		bullet = EnemyBullet()
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
+
+class FanEnemyWeapon(EnemyWeapon):
+	"""Fires 3 streams of bullets straight down, and at a 45 degree to the left and right of the enemy's center x coordinate.
+	"""
+	def __init__(self, enemy, interval):
+		super(FanEnemyWeapon, self).__init__(enemy, interval)
+	
+	def fire(self):
+		bullet = EnemyBullet(dy=-500)
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
+		bullet = EnemyBullet(500, -500)
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
+		bullet = EnemyBullet(-500, -500)
 		bullet.position = self.enemy.position
 		self.enemy.dispatch_event('on_enemy_fire', bullet)
 
@@ -305,7 +327,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.kill_vertex = random.randrange(0, num_vertices)
 		self.update_sprites()
 		# Test weapon
-		self.weapon = EnemyWeapon(self, 1)
+		self.weapon = FanEnemyWeapon(self, 1)
 		# Last transformation applied to this enemy
 		self.last_transform = 0
 		# Enemy shield - activated when player mistransforms
