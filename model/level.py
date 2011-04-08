@@ -1,8 +1,9 @@
+import pyglet
 import cocos
-import game
 from cocos.path import Bezier
+import game
 
-class Wave(cocos.cocosnode.CocosNode):
+class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Defines the type of enemies that appear in a level and defines their behavior.
 	"""
 	def __init__(self, enemy_list):
@@ -13,6 +14,7 @@ class Wave(cocos.cocosnode.CocosNode):
 		for i, enemy_tuple in enumerate(enemy_list):
 			vertex_count, enemy_action = enemy_tuple
 			enemy = game.EnemyPolygon(vertex_count)
+			enemy.push_handlers(self)
 			enemy.position =  w/len(enemy_list)*(i+0.5), h-100
 			self.add(enemy)
 			if enemy_action != None:
@@ -22,18 +24,28 @@ class Wave(cocos.cocosnode.CocosNode):
 				action = cocos.actions.Bezier(path, 5)
 				enemy.do(action)
 
-	def remove(self, entity):
-		super(Wave, self).remove(entity)
-
+	def on_enemy_death(self, entity):
+		entity.kill()
 		# Check if wave is empty
 		if not self.get_children():
-			print "Wave complete!"
+			self.dispatch_event('on_wave_complete', self)
+
+Wave.register_event_type('on_wave_complete')
+
 
 class Level(cocos.cocosnode.CocosNode):
 	"""Contains many waves of enemies that the player must defeat.
 	"""
-	def __init__(self):
-		pass
+	def __init__(self, wave_list):
+		super(Level,self).__init__()
+		# For testing purposes, only load first wave in wave_list
+		self.current_wave = wave_list[0]
+		self.current_wave.push_handlers(self)
+		self.add(self.current_wave)
+
+	def on_wave_complete(self, wave):
+		print "Wave complete!"
+		
 				
 BEND_NONE = 0
 BEND_DOWN = 1

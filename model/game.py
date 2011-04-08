@@ -12,8 +12,9 @@ class GameModel(pyglet.event.EventDispatcher):
 		super(GameModel, self).__init__()
 
 		# Testing wave class
-		self.wave = level.Wave([(3, None), (4, None), (5, None)])
-		for e in self.wave.get_children():
+		wave1 = level.Wave([(3, None), (4, None), (5, None)])
+		self.level = level.Level([wave1])
+		for e in self.level.current_wave.get_children():
 			e.push_handlers(self)
 			
 		# Add the player
@@ -48,13 +49,13 @@ class GameModel(pyglet.event.EventDispatcher):
 		"""
 		# Some inefficient naive collision detection
 		for b in self.player_bullets.get_children():
-			for e in self.wave.get_children():
+			for e in self.level.current_wave.get_children():
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
 					return
 		if not self.player.no_clip:
-			for e in self.wave.get_children():
+			for e in self.level.current_wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
 					return
@@ -109,7 +110,8 @@ class RotateCWBullet(Bullet):
 		super(RotateCWBullet, self).__init__('rotate_cw_bullet.png')
 	
 	def on_hit(self, entity):
-		entity.rotate_cw()
+		if entity.no_shield:
+			entity.rotate_cw()
 
 class RotateCCWBullet(Bullet):
 	"""Bullet that will rotate an enemy's kill vertex one 'step' counter clockwise.
@@ -118,7 +120,8 @@ class RotateCCWBullet(Bullet):
 		super(RotateCCWBullet, self).__init__('rotate_ccw_bullet.png')
 	
 	def on_hit(self, entity):
-		entity.rotate_ccw()
+		if entity.no_shield:
+			entity.rotate_ccw()
 		
 class FlipLeftBullet(Bullet):
 	"""Bullet that will flip an enemy by it's left axis of symmetry.
@@ -127,7 +130,8 @@ class FlipLeftBullet(Bullet):
 		super(FlipLeftBullet, self).__init__('flip_left_bullet.png')
 	
 	def on_hit(self, entity):
-		entity.flip_l()
+		if entity.no_shield:
+			entity.flip_l()
 
 class FlipRightBullet(Bullet):
 	"""Bullet that will flip an enemy by it's right axis of symmetry.
@@ -136,7 +140,8 @@ class FlipRightBullet(Bullet):
 		super(FlipRightBullet, self).__init__('flip_right_bullet.png')
 	
 	def on_hit(self, entity):
-		entity.flip_r()
+		if entity.no_shield:
+			entity.flip_r()
 
 class KillBullet(Bullet):
 	"""Bullet that will kill an enemy that has its kill vertex exposed.
@@ -146,7 +151,7 @@ class KillBullet(Bullet):
 	
 	def on_hit(self, entity):
 		if entity.kill_vertex == 0:
-			entity.parent.remove(entity)
+			entity.on_death()
 
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
@@ -239,6 +244,13 @@ class EnemyWeapon(object):
 class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Our polygonal adversary.
 	"""
+
+	# Transformation constants for tracking last transformation applied
+	ROTATE_CW = 1	
+	ROTATE_CCW = 2
+	FLIP_L = 3
+	FLIP_R = 4
+
 	def __init__(self, num_vertices, radius=30, image_file='enemy.png'):
 		#super(EnemyPolygon, self).__init__()
 		cocos.cocosnode.CocosNode.__init__(self)
@@ -262,12 +274,16 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.update_sprites()
 		# Test weapon
 		self.weapon = EnemyWeapon(self, 1)
+		# Last transformation applied to this enemy
+		self.last_transform = 0
+		# Enemy shield - activated when player mistransforms
+		self.no_shield = True
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
 		rect.center = self.position
 		return rect
-
+	
 	def update_sprites(self):
 		"""Sets the correct sprites based upon the kill vertex.
 		"""
@@ -292,25 +308,49 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 
 	# Rotate clockwise
 	def rotate_cw(self):
-		self.kill_vertex = (self.kill_vertex - 1) % self.num_vertices
-		self.update_sprites()
+		if self.last_transform != self.ROTATE_CW:
+			self.kill_vertex = (self.kill_vertex - 1) % self.num_vertices
+			self.update_sprites()
+			self.last_transform = self.ROTATE_CW
+		else:
+			self.on_bad_transform()
 
 	# Rotate counter-clockwise
 	def rotate_ccw(self):
-		self.kill_vertex = (self.kill_vertex + 1) % self.num_vertices
-		self.update_sprites()
+		if self.last_transform != self.ROTATE_CCW:
+			self.kill_vertex = (self.kill_vertex + 1) % self.num_vertices
+			self.update_sprites()
+			self.last_transform = self.ROTATE_CCW
+		else:
+			self.on_bad_transform()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the left of the downward vertex
 	def flip_l(self):
-		self.kill_vertex = (-self.kill_vertex - 1) % self.num_vertices
-		self.update_sprites()
+		if self.last_transform != self.FLIP_L:
+			self.kill_vertex = (-self.kill_vertex - 1) % self.num_vertices
+			self.update_sprites()
+			self.last_transform = self.FLIP_L
+		else:
+			self.on_bad_transform()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the right of the downward vertex
 	def flip_r(self):
-		self.kill_vertex = (-self.kill_vertex + 1) % self.num_vertices
-		self.update_sprites()
+		if self.last_transform != self.FLIP_R:
+			self.kill_vertex = (-self.kill_vertex + 1) % self.num_vertices
+			self.update_sprites()
+			self.last_transform = self.FLIP_R
+		else:
+			self.on_bad_transform()
+
+	def on_bad_transform(self):
+		def shield_up():
+			self.no_shield = False
+		def shield_down():
+			self.no_shield = True
+		self.do(cocos.actions.CallFunc(shield_up) + Delay(3) +
+			cocos.actions.CallFunc(shield_down))
 
 	# Need to work out the OpenGL/pyglet vertex buffer business here, but
 	# here's a sketch for how we can draw the polygon and its
@@ -319,11 +359,12 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		glPushMatrix()
 		self.transform()
 		# Draw polygon
-		#glColor3f(0.0, 0.0, 0.5) # Dark blue color
 		if self.kill_vertex != 0:
 			glColor3f(1.0, 0.0, 0.0) # red color
 		else:
 			glColor3f(0.0, 1.0, 0.0)
+		if not self.no_shield:
+			glColor3f(0.0, 0.0, 1.0)
 		glLineWidth(4)
 		glEnable(GL_LINE_SMOOTH)
 		# Construct polygon by its vertices, starting with the
@@ -352,5 +393,10 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		glEnd()
 		glPopMatrix()'''
 		glPopMatrix()
+
+	# Manage the death of the enemy polygon
+	def on_death(self):
+		self.dispatch_event('on_enemy_death', self)
 	
 EnemyPolygon.register_event_type('on_enemy_fire')
+EnemyPolygon.register_event_type('on_enemy_death')

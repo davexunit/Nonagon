@@ -16,5 +16,4 @@ class GameView(cocos.layer.ColorLayer):
 		self.add(self.model.player)
 		self.add(self.model.player_bullets)
 		self.add(self.model.enemy_bullets)
-		# self.add(self.model.enemies)
-		self.add(self.model.wave)
+		self.add(self.model.level)
