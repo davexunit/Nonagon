@@ -2,6 +2,7 @@ import pyglet
 import cocos
 from cocos.path import Bezier
 import game
+from collections import deque
 
 class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Defines the type of enemies that appear in a level and their behavior.
@@ -38,8 +39,7 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	def __init__(self, wave_list):
 		super(Level,self).__init__()
 		# For testing purposes, only load first wave in wave_list
-		self.wave_list = wave_list
-		self.next_wave()
+		self.wave_list = deque(wave_list)
 	
 	def next_wave(self):
 		# Dispatch level complete event and return when wave is finished.
@@ -48,7 +48,9 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			return
 
 		# Pop wave off of list
-		self.current_wave = self.wave_list.pop()
+		self.current_wave = self.wave_list.popleft()
+		# Dispatch new wave event
+		self.dispatch_event('on_new_wave', self.current_wave)
 		# Push handlers
 		self.current_wave.push_handlers(self)
 		# Add to node
@@ -58,6 +60,7 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.next_wave()
 
 Level.register_event_type('on_level_complete')
+Level.register_event_type('on_new_wave')
 				
 BEND_NONE = 0
 BEND_DOWN = 1

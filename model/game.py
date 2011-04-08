@@ -6,19 +6,23 @@ from cocos.actions import *
 from cocos.particle_systems import Explosion
 import math
 import random
+from collections import deque
 import level
 
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
 
+		self.levels = deque()
+		self.current_level = None
 		# Testing wave class
 		wave1 = level.Wave([(3, None), (4, None), (5, None)])
-		wave2 = level.Wave([(3, None), (4, None), (5, None)])
-		self.level = level.Level([wave1, wave2])
-		for e in self.level.current_wave.get_children():
-			e.push_handlers(self)
-		self.level.push_handlers(self)
+		wave2 = level.Wave([(4, None), (5, None)])
+		level1 = level.Level([wave1, wave2])
+		wave3 = level.Wave([(6, None), (6, None), (6, None)])
+		wave4 = level.Wave([(7, None), (8, None)])
+		level2 = level.Level([wave3, wave4])
+		self.levels.append(level2)
 			
 		# Add the player
 		self.player = Player()
@@ -33,16 +37,34 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Register player event listeners
 		self.player.push_handlers(self)
 	
+	def next_level(self):
+		# No levels left? WE HAVE A WINRAR!
+		if len(self.levels) == 0:
+			import getvictory
+			director.replace(getvictory.get_scene(self.player.score))
+			return
+
+		self.current_level = self.levels.popleft()
+		self.dispatch_event('on_new_level')
+		self.current_level.push_handlers(self)
+		self.current_level.next_wave()
+	
+	def on_new_wave(self, wave):
+		for e in wave.get_children():
+			e.push_handlers(self)
+	
 	def on_level_complete(self):
-		import getvictory
-		director.replace(getvictory.get_scene(self.player.score))
+		self.next_level()
 
 	def on_lose_life(self, lives):
+		# Make an explosion particle effect
 		p = Explosion()
 		p.position = self.player.position
 		self.particles.add(p)
+		# Reset the player to the center of the screen
 		w, h = director.get_window_size()
 		self.player.position = w/2, h/2
+		# If the player is out of lives it's game over.
 		if lives == 0:
 			import getgameover
 			director.replace(getgameover.get_scene(self.player.score))
@@ -52,7 +74,12 @@ class GameModel(pyglet.event.EventDispatcher):
 	
 	def on_enemy_death(self, enemy):
 		self.player.chain += 1
-		self.player.score += enemy.num_vertices * 10
+		max_transforms = enemy.num_vertices / 2
+		# Points multiplier
+		# Full points awarded for taking n/2 or less transformations to kill enemy
+		# Points reduced with each additional hit
+		multiplier = max_transforms / float(max(max_transforms, enemy.num_transforms))
+		self.player.score += enemy.num_vertices * 10 * multiplier
 		p = Explosion()
 		p.position = enemy.position
 		self.particles.add(p)
@@ -68,13 +95,13 @@ class GameModel(pyglet.event.EventDispatcher):
 		"""
 		# Some inefficient naive collision detection
 		for b in self.player_bullets.get_children():
-			for e in self.level.current_wave.get_children():
+			for e in self.current_level.current_wave.get_children():
 				if b.get_rect().intersects(e.get_rect()):
 					b.on_hit(e)
 					self.player_bullets.remove(b)
 					return
 		if not self.player.no_clip:
-			for e in self.level.current_wave.get_children():
+			for e in self.current_level.current_wave.get_children():
 				if self.player.get_rect().intersects(e.get_rect()):
 					self.player.on_hit()
 					return
@@ -84,9 +111,12 @@ class GameModel(pyglet.event.EventDispatcher):
 					self.enemy_bullets.remove(b)
 					return
 
+GameModel.register_event_type('on_new_level')
+
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.
 	Modified from the cocos2d sources to fit the needed purpose.
+	This action is used for bullets.
 	"""
 	def init(self, width, height):
 		self.width, self.height = width, height
@@ -175,7 +205,7 @@ class KillBullet(Bullet):
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
 	"""
-	def __init__(self, dx=0, dy=-500):
+	def __init__(self, dx=0, dy=-300):
 		super(EnemyBullet, self).__init__('enemy_bullet.png', dx, dy)
 	
 	def on_hit(self, entity):
@@ -300,15 +330,16 @@ class FanEnemyWeapon(EnemyWeapon):
 	"""
 	def __init__(self, enemy, interval):
 		super(FanEnemyWeapon, self).__init__(enemy, interval)
+		self.speed = 300
 	
 	def fire(self):
-		bullet = EnemyBullet(dy=-500)
+		bullet = EnemyBullet(dy=-self.speed)
 		bullet.position = self.enemy.position
 		self.enemy.dispatch_event('on_enemy_fire', bullet)
-		bullet = EnemyBullet(500, -500)
+		bullet = EnemyBullet(self.speed, -self.speed)
 		bullet.position = self.enemy.position
 		self.enemy.dispatch_event('on_enemy_fire', bullet)
-		bullet = EnemyBullet(-500, -500)
+		bullet = EnemyBullet(-self.speed, -self.speed)
 		bullet.position = self.enemy.position
 		self.enemy.dispatch_event('on_enemy_fire', bullet)
 
@@ -349,6 +380,8 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.last_transform = 0
 		# Enemy shield - activated when player mistransforms
 		self.no_shield = True
+		# Counts the amount of transformation bullets that have hit.
+		self.num_transforms = 0
 	
 	def get_rect(self):
 		rect = self.sprite.get_rect()
@@ -379,6 +412,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 
 	# Rotate clockwise
 	def rotate_cw(self):
+		self.num_transforms += 1
 		if self.last_transform != self.ROTATE_CW:
 			self.kill_vertex = (self.kill_vertex - 1) % self.num_vertices
 			self.update_sprites()
@@ -388,6 +422,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 
 	# Rotate counter-clockwise
 	def rotate_ccw(self):
+		self.num_transforms += 1
 		if self.last_transform != self.ROTATE_CCW:
 			self.kill_vertex = (self.kill_vertex + 1) % self.num_vertices
 			self.update_sprites()
@@ -398,6 +433,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	# Flip about line of symmetry passing through the side directly
 	# to the left of the downward vertex
 	def flip_l(self):
+		self.num_transforms += 1
 		if self.last_transform != self.FLIP_L:
 			self.kill_vertex = (-self.kill_vertex - 1) % self.num_vertices
 			self.update_sprites()
@@ -408,6 +444,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	# Flip about line of symmetry passing through the side directly
 	# to the right of the downward vertex
 	def flip_r(self):
+		self.num_transforms += 1
 		if self.last_transform != self.FLIP_R:
 			self.kill_vertex = (-self.kill_vertex + 1) % self.num_vertices
 			self.update_sprites()
