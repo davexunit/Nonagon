@@ -16,15 +16,22 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.levels = deque()
 		self.current_level = None
 		# Testing wave class
-		wave0 = level.Wave([(3, None)])
-		wave1 = level.Wave([(3, None), (3, None), (3, None)])
-		wave2 = level.Wave([(3, None), (4, None), (5, None), (3, None)])
+		def make_action(enemy):
+			path = level.create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, level.BEND_UP)
+			return  cocos.actions.Bezier(path, 5)
+		def make_weapon(enemy):
+			return BasicEnemyWeapon(enemy, 1)
+		enemy1 = level.WaveEnemy(3, 1, make_action, make_weapon)
+		enemy2 = level.WaveEnemy(5, 3, make_action, make_weapon)
+		wave0 = level.Wave(level.horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
+		wave1 = level.Wave(level.horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
+		wave2 = level.Wave(level.horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
 		level1 = level.Level([wave0, wave1, wave2])
-		wave3 = level.Wave([(6, None), (6, None), (6, None)])
-		wave4 = level.Wave([(7, None), (8, None)])
-		level2 = level.Level([wave3, wave4])
+		#wave3 = level.Wave([(6, None), (6, None), (6, None)])
+		#wave4 = level.Wave([(7, None), (8, None)])
+		#level2 = level.Level([wave3, wave4])
 		self.levels.append(level1)
-		self.levels.append(level2)
+		#self.levels.append(level2)
 			
 		# Add the player
 		self.player = Player()
@@ -355,7 +362,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	FLIP_L = 3
 	FLIP_R = 4
 
-	def __init__(self, num_vertices, radius=30, image_file='enemy.png'):
+	def __init__(self, num_vertices, kill_vertex, radius=30, image_file='enemy.png'):
 		#super(EnemyPolygon, self).__init__()
 		cocos.cocosnode.CocosNode.__init__(self)
 		pyglet.event.EventDispatcher.__init__(self)
@@ -374,10 +381,10 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		# Assign the kill vertex to a non-downward vertex. The polygon's
 		# downward vertex is zero, and the rest are numbered
 		# incrementally counter-clockwise from the downward vertex.
-		self.kill_vertex = random.randrange(0, num_vertices)
+		self.kill_vertex = kill_vertex
 		self.update_sprites()
-		# Test weapon
-		self.weapon = FanEnemyWeapon(self, 1)
+		# weapon
+		self.weapon = None
 		# Last transformation applied to this enemy
 		self.last_transform = 0
 		# Enemy shield - activated when player mistransforms
