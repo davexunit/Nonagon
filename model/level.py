@@ -3,27 +3,54 @@ import cocos
 from cocos.path import Bezier
 import game
 from collections import deque
+import copy
 
+class WaveEnemy(object):
+	"""This class contains the components that will make up an enemy in the wave.
+	"""
+	def __init__(self, num_vertices, kill_vertex, action_callback, weapon_callback):
+		self.num_vertices = num_vertices
+		self.kill_vertex = kill_vertex
+		self.action_callback = action_callback
+		self.weapon_callback = weapon_callback
+	
+	def make_enemy(self):
+		enemy = game.EnemyPolygon(self.num_vertices, self.kill_vertex)
+		enemy.weapon = self.weapon_callback(enemy)
+		def do_action(dt):
+			enemy.do(self.action_callback(enemy))
+		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
+		pyglet.clock.schedule_once(do_action, 0)
+		return enemy
+
+def horizontalLayout(y):
+	"""Accepts a list of enemies and places them in a horizontal line
+	"""
+	def horizontalLayoutFunc(enemies):
+		w, h = cocos.director.director.get_window_size()
+		l = len(enemies)
+		for i, e in enumerate(enemies):
+			e.position = (w / l) * (i + 0.25), y
+	return horizontalLayoutFunc
+		
 class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Defines the type of enemies that appear in a level and their behavior.
 	"""
-	def __init__(self, enemy_list):
+	def __init__(self, layout_strategy, enemy_list):
 		"""enemy_list is a list of (num_vertices, action) pairs.
 		"""
 		super(Wave, self).__init__()
-		w,h = cocos.director.director.get_window_size()
-		for i, enemy_tuple in enumerate(enemy_list):
-			vertex_count, enemy_action = enemy_tuple
-			enemy = game.EnemyPolygon(vertex_count)
+		self.layout_strategy = layout_strategy
+		self.enemy_list = list(enemy_list)
+	
+	def create_wave(self):
+		# Create enemies from given data
+		for e in self.enemy_list:
+			enemy = e.make_enemy()
 			enemy.push_handlers(self)
-			enemy.position =  w/len(enemy_list)*(i+0.25), h-100
 			self.add(enemy)
-			if enemy_action != None:
-				enemy.do(enemy_action)
-			else:
-				path = create_enemy_path(enemy, enemy.x + 100, enemy.y - 300, BEND_UP)
-				action = cocos.actions.Bezier(path, 5)
-				enemy.do(action)
+		# Position enemies
+		self.layout_strategy(self.get_children())
 
 	def on_enemy_death(self, enemy):
 		self.remove(enemy)
@@ -49,6 +76,8 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 
 		# Pop wave off of list
 		self.current_wave = self.wave_list.popleft()
+		# Initialize
+		self.current_wave.create_wave()
 		# Dispatch new wave event
 		self.dispatch_event('on_new_wave', self.current_wave)
 		# Push handlers
