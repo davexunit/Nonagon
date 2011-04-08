@@ -24,14 +24,13 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 				action = cocos.actions.Bezier(path, 5)
 				enemy.do(action)
 
-	def on_enemy_death(self, entity):
-		entity.kill()
+	def on_enemy_death(self, enemy):
 		# Check if wave is empty
+		self.remove(enemy)
 		if not self.get_children():
 			self.dispatch_event('on_wave_complete', self)
 
 Wave.register_event_type('on_wave_complete')
-
 
 class Level(cocos.cocosnode.CocosNode):
 	"""Contains many waves of enemies that the player must defeat.

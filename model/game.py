@@ -32,11 +32,14 @@ class GameModel(pyglet.event.EventDispatcher):
 	
 	def on_game_over(self):
 		import getgameover
-		director.replace(getgameover.get_scene())
+		director.replace(getgameover.get_scene(self.player.score))
+
+	def on_bad_transform(self, enemy):
+		self.player.chain = 0
 	
-	def fire_player_bullet(self, bullet):
-		bullet.position = self.player.position
-		self.player_bullets.add(bullet)
+	def on_enemy_death(self, enemy):
+		self.player.chain += 1
+		self.player.score += enemy.num_vertices * 10
 
 	def on_player_fire(self, bullet):
 		self.player_bullets.add(bullet)
@@ -151,7 +154,7 @@ class KillBullet(Bullet):
 	
 	def on_hit(self, entity):
 		if entity.kill_vertex == 0:
-			entity.on_death()
+			entity.kill()
 
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
@@ -180,7 +183,33 @@ class Player(cocos.sprite.Sprite):
 		self.do(cocos.actions.move_actions.BoundedMove(w, h))
 		self.velocity = 0, 0
 		self.no_clip = False
-		self.lives = 3
+		self._lives = 3
+		self._score = 0
+		self._chain = 0
+	
+	def _get_chain(self):
+		return self._chain
+	def _set_chain(self, chain):
+		self._chain = chain
+		if self._chain == 9:
+			self.lives += 1
+			self._chain = 0
+		self.dispatch_event('on_chain_change', self._chain)
+	chain = property(_get_chain, lambda self,chain: self._set_chain(chain))
+
+	def _get_lives(self):
+		return self._lives
+	def _set_lives(self, lives):
+		self._lives= lives
+		self.dispatch_event('on_lives_change', self._lives)
+	lives = property(_get_lives, lambda self,lives: self._set_lives(lives))
+
+	def _get_score(self):
+		return self._score
+	def _set_score(self, score):
+		self._score = score
+		self.dispatch_event('on_score_change', self._score)
+	score = property(_get_score, lambda self,score: self._set_score(score))
 
 	def move(self, direction):
 		self.move_mask |= direction
@@ -222,6 +251,9 @@ class Player(cocos.sprite.Sprite):
 		self.lose_life()
 
 Player.register_event_type('on_game_over')
+Player.register_event_type('on_chain_change')
+Player.register_event_type('on_lives_change')
+Player.register_event_type('on_score_change')
 Player.register_event_type('on_player_fire')
 
 class EnemyWeapon(object):
@@ -313,7 +345,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.update_sprites()
 			self.last_transform = self.ROTATE_CW
 		else:
-			self.on_bad_transform()
+			self.bad_transform()
 
 	# Rotate counter-clockwise
 	def rotate_ccw(self):
@@ -322,7 +354,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.update_sprites()
 			self.last_transform = self.ROTATE_CCW
 		else:
-			self.on_bad_transform()
+			self.bad_transform()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the left of the downward vertex
@@ -332,7 +364,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.update_sprites()
 			self.last_transform = self.FLIP_L
 		else:
-			self.on_bad_transform()
+			self.bad_transform()
 
 	# Flip about line of symmetry passing through the side directly
 	# to the right of the downward vertex
@@ -342,30 +374,27 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.update_sprites()
 			self.last_transform = self.FLIP_R
 		else:
-			self.on_bad_transform()
+			self.bad_transform()
 
-	def on_bad_transform(self):
+	def bad_transform(self):
 		def shield_up():
 			self.no_shield = False
 		def shield_down():
 			self.no_shield = True
-		self.do(cocos.actions.CallFunc(shield_up) + Delay(3) +
-			cocos.actions.CallFunc(shield_down))
+		self.do(cocos.actions.CallFunc(shield_up) + Delay(3) + cocos.actions.CallFunc(shield_down))
+		self.dispatch_event('on_bad_transform', self)
 
-	# Need to work out the OpenGL/pyglet vertex buffer business here, but
-	# here's a sketch for how we can draw the polygon and its
-	# kill vertex:
 	def draw(self):
 		glPushMatrix()
 		self.transform()
 		# Draw polygon
-		if self.kill_vertex != 0:
+		if not self.no_shield:
+			glColor3f(0.0, 0.0, 1.0)
+		elif self.kill_vertex != 0:
 			glColor3f(1.0, 0.0, 0.0) # red color
 		else:
 			glColor3f(0.0, 1.0, 0.0)
-		if not self.no_shield:
-			glColor3f(0.0, 0.0, 1.0)
-		glLineWidth(4)
+		glLineWidth(3)
 		glEnable(GL_LINE_SMOOTH)
 		# Construct polygon by its vertices, starting with the
 		# downward vertex and working counter-clockwise
@@ -375,28 +404,12 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			angle = 2 * math.pi * i / self.num_vertices - math.pi / 2
 			glVertex2f(self.radius * math.cos(angle), self.radius * math.sin(angle))
 		glEnd()
-
-		# Draw kill vertex indicator
-		# TODO: This should be a child node
-		'''kv_ind_size = 5 # Size of kill vertex indicator
-		glColor3f(1.0, 0.0, 0.0) # Red color
-		angle = 2 * math.pi * self.kill_vertex / self.num_vertices - math.pi / 2
-		kv_ind_x = self.radius * math.cos(angle)
-		kv_ind_y = self.radius * math.sin(angle)
-		glPushMatrix()
-		glTranslatef(kv_ind_x, kv_ind_y, 0)
-		glBegin(GL_QUADS)
-		glVertex2f(-kv_ind_size, -kv_ind_size)
-		glVertex2f(-kv_ind_size, kv_ind_size)
-		glVertex2f(kv_ind_size, kv_ind_size)
-		glVertex2f(kv_ind_size, -kv_ind_size)
-		glEnd()
-		glPopMatrix()'''
 		glPopMatrix()
 
 	# Manage the death of the enemy polygon
-	def on_death(self):
+	def kill(self):
 		self.dispatch_event('on_enemy_death', self)
 	
 EnemyPolygon.register_event_type('on_enemy_fire')
 EnemyPolygon.register_event_type('on_enemy_death')
+EnemyPolygon.register_event_type('on_bad_transform')

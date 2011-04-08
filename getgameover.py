@@ -4,10 +4,10 @@ from model.gameover import GameOverModel
 from view.gameover import GameOverView
 from controller.gameover import GameOverController
 
-def get_scene():
+def get_scene(score):
 	scene = cocos.scene.Scene()
 
-	model = GameOverModel()
+	model = GameOverModel(score)
 	view = GameOverView(model)
 	controller = GameOverController(model)
 

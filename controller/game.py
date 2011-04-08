@@ -59,7 +59,7 @@ class GameController(cocos.layer.Layer):
 		self.model.player.unschedule(self.fire)
 	
 	def fire(self, dt):
-		self.model.fire_player_bullet(KillBullet())
+		self.model.player.fire(KillBullet())
 	
 	def step(self, dt):
 		self.model.step(dt)
