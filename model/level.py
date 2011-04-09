@@ -239,7 +239,7 @@ def get_levels():
 	wave0 = Wave(vFormationLayout(500), [enemy1, enemy1, enemy2, enemy1, enemy1])
 	wave1 = Wave(circularLayout(200), [enemy1, enemy2, enemy1, enemy2, enemy1])
 	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
-	wave3 = Wave(horizontalLayout(500), [nonagon])
+	wave3 = Wave(vFormationLayout(500), [enemy1, enemy1, nonagon, enemy1, enemy1])
 #	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
 	level1 = get_level1()
 	level2 = Level([wave3], 'Boss.mp3')

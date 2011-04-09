@@ -666,8 +666,18 @@ class Nonagon(EnemyPolygon):
 	"""
 	def __init__(self):
 		super(Nonagon, self).__init__(9, 5, radius=80, image_file='nonagon_ship.png', death_sound='NonagonDeath.mp3')
+		self.schedule_interval(self.minion_check, 1)
+		self.no_shield = False
+		self.cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
+	
+	def minion_check(self, dt):
+		if self.parent != None:
+			# If nonagon is the only enemy left in the wave, bring his shield down.
+			if len(self.parent.get_children()) == 1:
+				self.no_shield = True
+				self.cackle.play()
+				self.unschedule(self.minion_check)
 	
 	def on_enter(self):
 		super(Nonagon, self).on_enter()
-		cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
-		cackle.play()
+		self.cackle.play()
