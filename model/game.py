@@ -339,7 +339,7 @@ class Player(cocos.sprite.Sprite):
 		self.do(cocos.actions.move_actions.BoundedMove(w, h))
 		self.velocity = 0, 0
 		self.no_clip = False
-		self._lives = 3
+		self._lives = 9
 		self._score = 0
 		self._chain = 0
 		self.hit_sound = pyglet.resource.media('PlayerDeath.mp3', streaming=False)
