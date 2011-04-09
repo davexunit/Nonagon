@@ -38,6 +38,10 @@ class GameController(cocos.layer.Layer):
 			self.model.player.fire(FlipRightBullet())
 		elif symbol == self.fire_key:
 			self.start_fire()
+		elif symbol == key.ESCAPE:
+			cocos.director.director.pop()
+			self.model.current_level.player.pause()
+		return True
 	
 	def on_key_release(self, symbol, modifiers):
 		if symbol == key.LEFT:

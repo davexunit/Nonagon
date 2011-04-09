@@ -295,6 +295,7 @@ class Player(cocos.sprite.Sprite):
 		self.no_clip = True
 		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
 		self.lives -= 1
+		self.chain = 0
 		self.dispatch_event('on_lose_life', self.lives)
 		self.hit_sound.play()
 	
@@ -321,7 +322,7 @@ class BasicEnemyWeapon(EnemyWeapon):
 	"""Fires bullets straight down
 	"""
 	def __init__(self, enemy, num_bullets, interval, intermission):
-		super(BasicEnemyWeapon, self).__init__(enemy, (CallFunc(self.fire) + Delay(interval)) * num_bullets + Delay(intermission))
+		super(BasicEnemyWeapon, self).__init__(enemy, Delay(intermission) + (CallFunc(self.fire) + Delay(interval)) * num_bullets)
 	
 	def fire(self):
 		bullet = EnemyBullet()
@@ -331,9 +332,9 @@ class BasicEnemyWeapon(EnemyWeapon):
 class FanEnemyWeapon(EnemyWeapon):
 	"""Fires 3 streams of bullets straight down, and at a 45 degree to the left and right of the enemy's center x coordinate.
 	"""
-	def __init__(self, enemy, num_bullets, interval, intermission):
+	def __init__(self, enemy, shoot_time, interval, intermission):
 		self.speed = 300
-		action = (CallFunc(self.fire) + Delay(interval)) * num_bullets + Delay(intermission)
+		action = Delay(intermission) + (CallFunc(self.fire) + Delay(interval)) * int(shoot_time / interval)
 		super(FanEnemyWeapon, self).__init__(enemy, action)
 	
 	def fire(self):
@@ -347,6 +348,25 @@ class FanEnemyWeapon(EnemyWeapon):
 		bullet.position = self.enemy.position
 		self.enemy.dispatch_event('on_enemy_fire', bullet)
 
+class SweepEnemyWeapon(EnemyWeapon):
+	"""Sprays bullets from side to side in a sweeping motion
+	"""
+	def __init__(self, enemy, sweep_time, shot_interval, intermission):
+		self.speed = 300
+		action = Delay(intermission) + (CallFunc(self.fire) + Delay(shot_interval)) * int(sweep_time / shot_interval)
+		super(SweepEnemyWeapon, self).__init__(enemy, action)
+		self.sweep_time = sweep_time
+		self.shot_interval = shot_interval
+		self.intermission = intermission
+	
+	def fire(self):
+		# TODO: implement a sweeping bullet pattern
+		angle = math.pi
+		x = math.cos(angle) * self.speed
+		bullet = EnemyBullet(dx=x, dy=-self.speed)
+		bullet.position = self.enemy.position
+		self.enemy.dispatch_event('on_enemy_fire', bullet)
+	
 class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Our polygonal adversary.
 	"""

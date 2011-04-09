@@ -92,7 +92,8 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.player.queue(self.music)
 	
 	def next_wave(self):
-		self.player.play()
+		if not self.player.playing:
+			self.player.play()
 		# Dispatch level complete event and return when wave is finished.
 		if len(self.wave_list) == 0:
 			self.dispatch_event('on_level_complete')
@@ -156,9 +157,11 @@ def get_levels():
 	def make_basic_weapon(enemy):
 		return game.BasicEnemyWeapon(enemy, 3, .3, 2)
 	def make_fan_weapon(enemy):
-		return game.FanEnemyWeapon(enemy, 40, .1, 3)
+		return game.FanEnemyWeapon(enemy, 3, .1, 3)
+	def make_sweep_weapon(enemy):
+		return game.SweepEnemyWeapon(enemy, 3, .1, 3)
 	enemy1 = WaveEnemy(3, 1, make_action, make_basic_weapon)
-	enemy2 = WaveEnemy(5, 3, make_action, make_basic_weapon)
+	enemy2 = WaveEnemy(5, 3, make_action, make_sweep_weapon)
 	nonagon = WaveBoss(make_action, make_fan_weapon)
 	wave0 = Wave(horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
 	wave1 = Wave(horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
