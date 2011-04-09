@@ -118,7 +118,7 @@ class GameModel(pyglet.event.EventDispatcher):
 			self.message.visible = False
 		delay = 1
 		self.message.do(CallFunc(show) + Delay(delay) + CallFunc(hide))
-		self.current_level.do(Delay(delay) + CallFunc(self.next_wave))
+		self.current_level.do(Delay(delay) + (CallFunc(self.next_wave) | CallFunc(self.player.invuln)))
 	
 	def on_level_complete(self):
 		# Show level complete message
@@ -131,7 +131,7 @@ class GameModel(pyglet.event.EventDispatcher):
 			self.message.visible = False
 		delay = 1
 		self.message.do(CallFunc(show) + Delay(delay) + CallFunc(hide))
-		self.current_level.do(Delay(delay) + (CallFunc(self.next_level) | CallFunc(self.player.invuln)))
+		self.current_level.do(Delay(delay) + CallFunc(self.next_level))
 
 	def on_lose_life(self, lives):
 		# Make an explosion particle effect
@@ -419,7 +419,7 @@ class Player(cocos.sprite.Sprite):
 		def func():
 			self.no_clip = False
 		self.no_clip = True
-		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
+		self.do(cocos.actions.Blink(20, 1.5) + cocos.actions.CallFunc(func))
 	
 	def on_hit(self):
 		self.lose_life()
