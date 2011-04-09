@@ -30,12 +30,13 @@ class WaveEnemy(object):
 class WaveBoss(object):
 	"""This class is a factory for making THE NONAGON!!!1!1!one!
 	"""
-	def __init__(self, action_callback, weapon_callback):
+	def __init__(self, action_callback, weapon_callback, final=False):
 		self.action_callback = action_callback
 		self.weapon_callback = weapon_callback
+		self.final = final
 		
 	def make_enemy(self):
-		enemy = game.Nonagon()
+		enemy = game.Nonagon(self.final)
 		enemy.weapon = self.weapon_callback(enemy)
 		def do_action(dt):
 			enemy.do(self.action_callback(enemy))
@@ -352,10 +353,7 @@ def get_level1():
 	wave9 = Wave(circularLayout(100), wave9_enemies)
 	level1_waves.append(wave9)
 
-<<<<<<< HEAD
 	return Level(level1_waves, 'Level1.mp3', 'background1.png')
-=======
-	return Level(level1_waves, 'Level1.mp3')
 
 def get_level2():
 	"""Creates and returns level 2.
@@ -447,6 +445,4 @@ def get_level2():
 	wave9 = Wave(horizontalLayout(400), wave9_enemies)
 	level2_waves.append(wave9)
 
-	return Level(level2_waves, 'Level2.mp3')
-
->>>>>>> skarrmann/master
+	return Level(level2_waves, 'Level2.mp3', 'background2.png')
