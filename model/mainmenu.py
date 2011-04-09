@@ -30,7 +30,7 @@ class Instructions(cocos.layer.Layer):
 		self.messages.append('This game is a shoot-em-up with a math puzzle twist.\nYou are Sigma, the ultimate Mathemagician.\nYour enemies are an angry group of regular polygons.')
 		self.messages.append('They have shields to protect themselves, but they have a weakness...\n...They have a "kill vertex" that is marked by a large dot.')
 		self.messages.append('You must shoot the kill vertex to kill the enemy.\nTo do that you must fire transformation bullets to make the kill vertex face downward.')
-		self.messages.append('If you manage to kill all of the minions, you will fight the mighty Nonagon!')
+		self.messages.append('If you manage to kill all of the minions, you will fight the mighty Nonagon!\nBeware, for the Nonagon has 9 lives!')
 		self.messages.append('Control your ship with the UP, DOWN, LEFT, and RIGHT arrow keys')
 		self.messages.append('Press A to fire a ROTATE CLOCKWISE bullet')
 		self.messages.append('Press S to fire a ROTATE COUNTER-CLOCKWISE bullet')
