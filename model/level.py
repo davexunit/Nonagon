@@ -17,7 +17,11 @@ class WaveEnemy(object):
 		self.weapon_callback = weapon_callback
 	
 	def make_enemy(self):
-		enemy = game.EnemyPolygon(self.num_vertices, self.kill_vertex)
+		if self.num_vertices < 5:
+			image = 'enemy1_ship.png'
+		else:
+			image = 'enemy2_ship.png'
+		enemy = game.EnemyPolygon(self.num_vertices, self.kill_vertex, image_file=image)
 		enemy.weapon = self.weapon_callback(enemy)
 		def do_action(dt):
 			enemy.do(self.action_callback(enemy))
