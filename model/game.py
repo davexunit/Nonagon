@@ -9,7 +9,7 @@ import math
 import random
 from collections import deque
 import level
-from view.mainmenu import paddedVerticalLayout
+from mainmenu import paddedVerticalLayout
 
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
@@ -37,6 +37,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		if not self.paused:
 			self.paused = True
 			self.dispatch_event('on_pause')
+			# Pause everything... what a mess... oh well no time for love
 			self.player.pause_scheduler()
 			self.player.pause()
 			self.player_bullets.pause_scheduler()
