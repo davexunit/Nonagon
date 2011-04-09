@@ -223,6 +223,9 @@ class Player(cocos.sprite.Sprite):
 		self._lives = 3
 		self._score = 0
 		self._chain = 0
+		self.hit_sound = pyglet.resource.media('PlayerDeath.mp3', streaming=False)
+		self.fire_sound = pyglet.resource.media('QuickLaser.mp3', streaming=False)
+		self.life_sound = pyglet.resource.media('yeah.wav', streaming=False)
 	
 	def _get_chain(self):
 		return self._chain
@@ -231,6 +234,7 @@ class Player(cocos.sprite.Sprite):
 		if self._chain == 9:
 			self.lives += 1
 			self._chain = 0
+			self.life_sound.play()
 		self.dispatch_event('on_chain_change', self._chain)
 	chain = property(_get_chain, lambda self,chain: self._set_chain(chain))
 
@@ -268,6 +272,7 @@ class Player(cocos.sprite.Sprite):
 		if not self.no_clip:
 			bullet.position = self.position
 			self.dispatch_event('on_player_fire', bullet)
+			self.fire_sound.play()
 	
 	def update_velocity(self):
 		dx = 0
@@ -291,6 +296,7 @@ class Player(cocos.sprite.Sprite):
 		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
 		self.lives -= 1
 		self.dispatch_event('on_lose_life', self.lives)
+		self.hit_sound.play()
 	
 	def on_hit(self):
 		self.lose_life()
@@ -304,10 +310,9 @@ Player.register_event_type('on_player_fire')
 class EnemyWeapon(object):
 	"""Controls the pattern and rate with which the enemy fires bullets
 	"""
-	def __init__(self, enemy, interval):
+	def __init__(self, enemy, action):
 		self.enemy = enemy
-		action = Repeat(Delay(2) + (CallFunc(self.fire) + Delay(.2)) * 3)
-		self.enemy.do(action)
+		self.enemy.do(Repeat(action))
 	
 	def fire(self):
 		pass
@@ -315,8 +320,8 @@ class EnemyWeapon(object):
 class BasicEnemyWeapon(EnemyWeapon):
 	"""Fires bullets straight down
 	"""
-	def __init__(self, enemy, interval):
-		super(BasicEnemyWeapon, self).__init__(enemy, interval)
+	def __init__(self, enemy, num_bullets, interval, intermission):
+		super(BasicEnemyWeapon, self).__init__(enemy, (CallFunc(self.fire) + Delay(interval)) * num_bullets + Delay(intermission))
 	
 	def fire(self):
 		bullet = EnemyBullet()
@@ -326,9 +331,10 @@ class BasicEnemyWeapon(EnemyWeapon):
 class FanEnemyWeapon(EnemyWeapon):
 	"""Fires 3 streams of bullets straight down, and at a 45 degree to the left and right of the enemy's center x coordinate.
 	"""
-	def __init__(self, enemy, interval):
-		super(FanEnemyWeapon, self).__init__(enemy, interval)
+	def __init__(self, enemy, num_bullets, interval, intermission):
 		self.speed = 300
+		action = (CallFunc(self.fire) + Delay(interval)) * num_bullets + Delay(intermission)
+		super(FanEnemyWeapon, self).__init__(enemy, action)
 	
 	def fire(self):
 		bullet = EnemyBullet(dy=-self.speed)
@@ -351,7 +357,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	FLIP_L = 3
 	FLIP_R = 4
 
-	def __init__(self, num_vertices, kill_vertex, radius=35, image_file='enemy1_ship.png'):
+	def __init__(self, num_vertices, kill_vertex, radius=35, image_file='enemy1_ship.png', death_sound='MinionDeath.mp3'):
 		#super(EnemyPolygon, self).__init__()
 		cocos.cocosnode.CocosNode.__init__(self)
 		pyglet.event.EventDispatcher.__init__(self)
@@ -383,6 +389,10 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.num_transforms = 0
 		# Opacity
 		self._opacity = 255
+		# Sounds
+		self.death_sound = pyglet.resource.media(death_sound, streaming=False)
+		self.bad_sound = pyglet.resource.media('BadTransform.mp3', streaming=False)
+		self.transform_sound = pyglet.resource.media('Bloop.mp3', streaming=False)
 	
 	def _get_opacity(self):
 		return self._opacity
@@ -429,6 +439,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.kill_vertex = (self.kill_vertex - 1) % self.num_vertices
 			self.update_sprites()
 			self.last_transform = self.ROTATE_CW
+			self.transform_sound.play()
 		else:
 			self.bad_transform()
 
@@ -439,6 +450,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.kill_vertex = (self.kill_vertex + 1) % self.num_vertices
 			self.update_sprites()
 			self.last_transform = self.ROTATE_CCW
+			self.transform_sound.play()
 		else:
 			self.bad_transform()
 
@@ -450,6 +462,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.kill_vertex = (-self.kill_vertex - 1) % self.num_vertices
 			self.update_sprites()
 			self.last_transform = self.FLIP_L
+			self.transform_sound.play()
 		else:
 			self.bad_transform()
 
@@ -461,6 +474,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.kill_vertex = (-self.kill_vertex + 1) % self.num_vertices
 			self.update_sprites()
 			self.last_transform = self.FLIP_R
+			self.transform_sound.play()
 		else:
 			self.bad_transform()
 
@@ -471,10 +485,12 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			self.no_shield = True
 		self.do(cocos.actions.CallFunc(shield_up) + Delay(3) + cocos.actions.CallFunc(shield_down))
 		self.dispatch_event('on_bad_transform', self)
+		self.bad_sound.play()
 
 	# Manage the death of the enemy polygon
 	def kill(self):
 		self.dispatch_event('on_enemy_death', self)
+		self.death_sound.play()
 
 	def draw(self):
 		glPushMatrix()
@@ -506,8 +522,9 @@ class Nonagon(EnemyPolygon):
 	"""The big kahuna. The rumble from down under. The brother from another mother. The one, the only: NONAGON!
 	"""
 	def __init__(self):
-		super(Nonagon, self).__init__(9, 5, radius=100, image_file='nonagon_ship.png')
-		self.cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
+		super(Nonagon, self).__init__(9, 5, radius=80, image_file='nonagon_ship.png', death_sound='NonagonDeath.mp3')
 	
 	def on_enter(self):
-		self.cackle.play()
+		super(Nonagon, self).on_enter()
+		cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
+		cackle.play()

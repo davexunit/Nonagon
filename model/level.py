@@ -21,7 +21,7 @@ class WaveEnemy(object):
 		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
 		pyglet.clock.schedule_once(do_action, 0)
 		# Fade in because it looks nicer than something just popping into existance
-		enemy.do(FadeIn(1))
+		enemy.do(FadeIn(2))
 		return enemy
 
 class WaveBoss(object):
@@ -39,7 +39,7 @@ class WaveBoss(object):
 		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
 		pyglet.clock.schedule_once(do_action, 0)
 		# Fade in because it looks nicer than something just popping into existance
-		enemy.do(FadeIn(1))
+		enemy.do(FadeIn(2))
 		return enemy
 
 def horizontalLayout(y):
@@ -82,15 +82,21 @@ Wave.register_event_type('on_wave_complete')
 class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Contains many waves of enemies that the player must defeat.
 	"""
-	def __init__(self, wave_list):
+	def __init__(self, wave_list, music_file):
 		super(Level,self).__init__()
 		# For testing purposes, only load first wave in wave_list
 		self.wave_list = deque(wave_list)
+		self.player = pyglet.media.Player()
+		self.player.eos_action = pyglet.media.Player.EOS_LOOP
+		self.music = pyglet.resource.media(music_file)
+		self.player.queue(self.music)
 	
 	def next_wave(self):
+		self.player.play()
 		# Dispatch level complete event and return when wave is finished.
 		if len(self.wave_list) == 0:
 			self.dispatch_event('on_level_complete')
+			self.player.pause()
 			return
 
 		# Pop wave off of list
@@ -147,16 +153,20 @@ def get_levels():
 		path = create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, BEND_UP)
 		action = Bezier(path, 5)
 		return Repeat(action + MoveBy((-100, 150)))
-	def make_weapon(enemy):
-		return game.BasicEnemyWeapon(enemy, 1)
-	enemy1 = WaveEnemy(3, 1, make_action, make_weapon)
-	enemy2 = WaveEnemy(5, 3, make_action, make_weapon)
-	nonagon = WaveBoss(make_action, make_weapon)
+	def make_basic_weapon(enemy):
+		return game.BasicEnemyWeapon(enemy, 3, .3, 2)
+	def make_fan_weapon(enemy):
+		return game.FanEnemyWeapon(enemy, 40, .1, 3)
+	enemy1 = WaveEnemy(3, 1, make_action, make_basic_weapon)
+	enemy2 = WaveEnemy(5, 3, make_action, make_basic_weapon)
+	nonagon = WaveBoss(make_action, make_fan_weapon)
 	wave0 = Wave(horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
 	wave1 = Wave(horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
 	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
 	wave3 = Wave(horizontalLayout(500), [nonagon])
-	level1 = Level([wave3, wave1, wave2, wave3])
+	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
+	level2 = Level([wave3], 'Boss.mp3')
 	levels.append(level1)
+	levels.append(level2)
 
 	return levels

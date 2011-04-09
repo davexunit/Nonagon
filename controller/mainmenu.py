@@ -11,3 +11,11 @@ class MainMenuController(cocos.layer.Layer):
 	def __init__(self, model):
 		super(MainMenuController, self).__init__()
 		self.model = model
+	
+	def on_enter(self):
+		super(MainMenuController, self).on_enter()
+		self.model.player.play()
+	
+	def on_exit(self):
+		super(MainMenuController, self).on_exit()
+		self.model.player.pause()
