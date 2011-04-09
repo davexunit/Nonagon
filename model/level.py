@@ -17,7 +17,11 @@ class WaveEnemy(object):
 		self.weapon_callback = weapon_callback
 	
 	def make_enemy(self):
-		enemy = game.EnemyPolygon(self.num_vertices, self.kill_vertex)
+		if self.num_vertices < 5:
+			image = 'enemy1_ship.png'
+		else:
+			image = 'enemy2_ship.png'
+		enemy = game.EnemyPolygon(self.num_vertices, self.kill_vertex, image_file=image)
 		enemy.weapon = self.weapon_callback(enemy)
 		def do_action(dt):
 			enemy.do(self.action_callback(enemy))
@@ -30,12 +34,13 @@ class WaveEnemy(object):
 class WaveBoss(object):
 	"""This class is a factory for making THE NONAGON!!!1!1!one!
 	"""
-	def __init__(self, action_callback, weapon_callback):
+	def __init__(self, action_callback, weapon_callback, final=False):
 		self.action_callback = action_callback
 		self.weapon_callback = weapon_callback
+		self.final = final
 		
 	def make_enemy(self):
-		enemy = game.Nonagon()
+		enemy = game.Nonagon(self.final)
 		enemy.weapon = self.weapon_callback(enemy)
 		def do_action(dt):
 			enemy.do(self.action_callback(enemy))
@@ -259,9 +264,9 @@ def get_levels():
 	level1 = get_level1()
 	level2 = get_level2()
 #	level2 = Level([wave3], 'Boss.mp3')
+	level3 = Level([wave3], 'Boss.mp3', 'background3.png')
 #	levels.append(level1)
-#	levels.append(level2)
-	levels.append(level3)
+	levels.append(level2)
 
 	return levels
 
