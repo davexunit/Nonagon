@@ -475,6 +475,7 @@ class SweepEnemyWeapon(EnemyWeapon):
 	"""
 	def __init__(self, enemy, sweep_time, shot_interval, intermission):
 		self.speed = 300
+		self.direction = 0
 		action = Delay(intermission) + (CallFunc(self.fire) + Delay(shot_interval)) * int(sweep_time / shot_interval)
 		super(SweepEnemyWeapon, self).__init__(enemy, action)
 		self.sweep_time = sweep_time
@@ -482,8 +483,8 @@ class SweepEnemyWeapon(EnemyWeapon):
 		self.intermission = intermission
 	
 	def fire(self):
-		# TODO: implement a sweeping bullet pattern
-		angle = math.pi
+		angle = self.direction*-math.pi
+		self.direction += 0.1
 		x = math.cos(angle) * self.speed
 		bullet = EnemyBullet(dx=x, dy=-self.speed)
 		bullet.position = self.enemy.position

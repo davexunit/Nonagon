@@ -77,7 +77,7 @@ def vFormationLayout(y):
 				vertical_offset += 1
 			elif i > l/2.:
 				vertical_offset -= 1
-			e.position = (w / l) * (i + 0.25), y - vertical_offset*60
+			e.position = (w / l) * (i + 0.25), y - vertical_offset*70
 	return vFormationLayoutFunc
 		
 class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
@@ -257,9 +257,9 @@ def get_level1():
 
 	# Wave 1
 	wave1_enemies = []
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_cw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_sweep_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_sweep_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_sweep_weapon) )
 	wave1 = Wave(horizontalLayout(500), wave1_enemies)
 	level1_waves.append(wave1)
 
@@ -283,5 +283,39 @@ def get_level1():
 	#level1_waves.append(wave3)
 
 	# Wave 4
+	wave4_enemies = []
+	wave4_enemies.append( WaveEnemy(3, 2, enemyactions.med_cw_square, make_basic_weapon) )
+	wave4_enemies.append( WaveEnemy(3, 2, enemyactions.small_cw_square, make_basic_weapon) )
+	wave4_enemies.append( WaveEnemy(3, 1, enemyactions.med_ccw_square, make_basic_weapon) )
+	wave4_enemies.append( WaveEnemy(3, 1, enemyactions.small_ccw_square, make_basic_weapon) )
+	wave4 = Wave(vFormationLayout(400), wave4_enemies)
+	level1_waves.append(wave4)
+
+	# Wave 5
+	wave5_enemies = []
+	wave5_enemies.append( WaveEnemy(4, 1, enemyactions.top_v, make_sweep_weapon) )
+	wave5_enemies.append( WaveEnemy(4, 2, enemyactions.bottom_v, make_basic_weapon) )
+	wave5 = Wave(circularLayout(200), wave5_enemies)
+	level1_waves.append(wave5)
+
+	# Wave 6
+	wave6_enemies = []
+
+
+	# Wave 7
+	wave7_enemies = []
+	wave7_enemies.append( WaveEnemy(4, 1, enemyactions.vertical_dance, make_basic_weapon) )
+	wave7_enemies.append( WaveEnemy(4, 2, enemyactions.vertical_dance, make_fan_weapon) )
+	wave7_enemies.append( WaveEnemy(4, 3, enemyactions.vertical_dance, make_basic_weapon) )
+	wave7 = Wave(horizontalLayout(500), wave7_enemies)
+	level1_waves.append(wave7)
+
+	# Wave 9
+	wave9_enemies = []
+	wave9_enemies.append( WaveEnemy(4, 2, enemyactions.left_v, make_fan_weapon) )
+	wave9_enemies.append( WaveEnemy(5, 3, enemyactions.top_v, make_basic_weapon) )
+	wave9_enemies.append( WaveEnemy(4, 2, enemyactions.right_v, make_fan_weapon) )
+	wave9 = Wave(circularLayout(100), wave9_enemies)
+	level1_waves.append(wave9)
 
 	return Level(level1_waves, 'Level1.mp3')
