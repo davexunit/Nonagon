@@ -18,6 +18,8 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Get levels
 		self.levels = level.get_levels()
 		self.current_level = None
+		self.num_wave = 0
+		self.num_level = 0
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
@@ -27,6 +29,11 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.enemy_bullets = cocos.batch.BatchNode()
 		# Node for particles
 		self.particles = cocos.cocosnode.CocosNode()
+		# Message box that will displayed in between waves and levels
+		w, h = director.get_window_size()
+		self.message = cocos.text.Label('nothing', color=(50, 50, 50, 255), font_name='Orbitron', font_size=40, anchor_x='center', anchor_y='center')
+		self.message.position = w/2, h/2
+		self.message.visible = False
 		# Register player event listeners
 		self.player.push_handlers(self)
 		# Paused flag
@@ -86,6 +93,8 @@ class GameModel(pyglet.event.EventDispatcher):
 		# No levels left? WE HAVE A WINRAR!
 		if len(self.levels) == 0:
 			import getvictory
+			self.current_level.player.pause()
+			pyglet.resource.media('yeah.wav').play()
 			director.replace(getvictory.get_scene(self.player.score))
 			return
 
@@ -94,12 +103,32 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.current_level.push_handlers(self)
 		self.current_level.next_wave()
 	
-	def on_new_wave(self, wave):
-		for e in wave.get_children():
-			e.push_handlers(self)
+	def on_level_wave_complete(self):
+		# Show wave complete message
+		self.num_wave += 1
+		self.message.element.text = 'WAVE %d COMPLETE' % self.num_wave
+		def show():
+			self.message.visible = True
+		def hide():
+			self.message.visible = False
+		self.message.do(CallFunc(show) + Delay(2) + CallFunc(hide))
+		def next_wave():
+			self.current_level.next_wave()
+			for e in self.current_level.current_wave.get_children():
+				e.push_handlers(self)
+		self.current_level.do(Delay(2) + CallFunc(next_wave))
 	
 	def on_level_complete(self):
-		self.next_level()
+		# Show level complete message
+		self.num_level += 1
+		self.num_wave = 0
+		self.message.element.text = 'LEVEL %d COMPLETE' % self.num_level
+		def show():
+			self.message.visible = True
+		def hide():
+			self.message.visible = False
+		self.message.do(CallFunc(show) + Delay(2) + CallFunc(hide))
+		self.current_level.do(Delay(2) + (CallFunc(self.next_level) | CallFunc(self.player.invuln)))
 
 	def on_lose_life(self, lives):
 		# Make an explosion particle effect
@@ -112,6 +141,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		# If the player is out of lives it's game over.
 		if lives == 0:
 			import getgameover
+			self.current_level.player.pause()
 			director.replace(getgameover.get_scene(self.player.score))
 
 	def on_bad_transform(self, enemy):
@@ -376,14 +406,17 @@ class Player(cocos.sprite.Sprite):
 		self.velocity = (dx, dy)
 	
 	def lose_life(self):
-		def func():
-			self.no_clip = False
-		self.no_clip = True
-		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
+		self.invuln()
 		self.lives -= 1
 		self.chain = 0
 		self.dispatch_event('on_lose_life', self.lives)
 		self.hit_sound.play()
+	
+	def invuln(self):
+		def func():
+			self.no_clip = False
+		self.no_clip = True
+		self.do(cocos.actions.Blink(20, 3) + cocos.actions.CallFunc(func))
 	
 	def on_hit(self):
 		self.lose_life()

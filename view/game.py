@@ -34,6 +34,7 @@ class GameView(cocos.layer.ColorLayer):
 		self.add(self.model.player_bullets, z=3)
 		self.add(self.model.enemy_bullets, z=2)
 		self.add(self.model.particles, z=6)
+		self.add(self.model.message, z=10)
 		self.add(self.lives, z=10)
 		self.add(self.score, z=10)
 		self.add(self.chain, z=10)

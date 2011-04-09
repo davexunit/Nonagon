@@ -126,7 +126,7 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.remove(enemy)
 		# Check if wave is empty
 		if not self.get_children():
-			self.dispatch_event('on_wave_complete', self)
+			self.dispatch_event('on_wave_complete')
 
 Wave.register_event_type('on_wave_complete')
 
@@ -176,18 +176,16 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.current_wave = self.wave_list.popleft()
 		# Initialize
 		self.current_wave.create_wave()
-		# Dispatch new wave event
-		self.dispatch_event('on_new_wave', self.current_wave)
 		# Push handlers
 		self.current_wave.push_handlers(self)
 		# Add to node
 		self.add(self.current_wave)
 
-	def on_wave_complete(self, wave):
-		self.next_wave()
+	def on_wave_complete(self):
+		self.dispatch_event('on_level_wave_complete')
 
 Level.register_event_type('on_level_complete')
-Level.register_event_type('on_new_wave')
+Level.register_event_type('on_level_wave_complete')
 				
 BEND_NONE = 0
 BEND_DOWN = 1
@@ -273,7 +271,7 @@ def get_level1():
 	wave2_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_basic_weapon) )
 	wave2_enemies.append( WaveEnemy(4, 1, enemyactions.topright_to_bottomleft, make_basic_weapon) )
 	wave2 = Wave(horizontalLayout(500), wave2_enemies)
-	level1_waves.append(wave2)
+	#level1_waves.append(wave2)
 
 	# Wave 3
 	wave3_enemies = []
@@ -282,7 +280,7 @@ def get_level1():
 	wave3_enemies.append( WaveEnemy(4, 2, enemyactions.vertical_dance, make_basic_weapon) )
 	wave3_enemies.append( WaveEnemy(3, 2, enemyactions.horizontal_dance, make_basic_weapon) )
 	wave3 = Wave(vFormationLayout(500), wave3_enemies)
-	level1_waves.append(wave3)
+	#level1_waves.append(wave3)
 
 	# Wave 4
 
