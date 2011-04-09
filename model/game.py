@@ -158,7 +158,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		# Points reduced with each additional hit
 		multiplier = max_transforms / float(max(max_transforms, enemy.num_transforms))
 		self.player.score += enemy.num_vertices * 10 * multiplier
-		p = Explosion()
+		p = ParticleExplosion()
 		p.position = enemy.position
 		self.particles.add(p)
 
@@ -189,6 +189,11 @@ class GameModel(pyglet.event.EventDispatcher):
 						b.on_hit(self.player)
 						self.enemy_bullets.remove(b)
 						return
+
+class ParticleExplosion(Explosion):
+	"""Modified Explosion particle system using a custom texture
+	"""
+	texture = pyglet.resource.image('particle.png').texture
 
 class PauseMenu(Menu):
 	"""The pause menu.
@@ -664,11 +669,12 @@ EnemyPolygon.register_event_type('on_bad_transform')
 class Nonagon(EnemyPolygon):
 	"""The big kahuna. The rumble from down under. The brother from another mother. The one, the only: NONAGON!
 	"""
-	def __init__(self):
+	def __init__(self, final=False):
 		super(Nonagon, self).__init__(9, 5, radius=80, image_file='nonagon_ship.png', death_sound='NonagonDeath.mp3')
 		self.schedule_interval(self.minion_check, 1)
 		self.no_shield = False
 		self.cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
+		self.final = final
 	
 	def minion_check(self, dt):
 		if self.parent != None:
@@ -681,3 +687,9 @@ class Nonagon(EnemyPolygon):
 	def on_enter(self):
 		super(Nonagon, self).on_enter()
 		self.cackle.play()
+
+	def kill(self):
+		self.dispatch_event('on_enemy_death', self)
+		# Only play death sound if final flag is set
+		if self.final:
+			self.death_sound.play()
