@@ -1,5 +1,6 @@
 import pyglet
 import cocos
+from cocos.director import director
 from cocos.actions import *
 import math
 import game
@@ -143,13 +144,17 @@ Wave.register_event_type('on_wave_complete')
 class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Contains many waves of enemies that the player must defeat.
 	"""
-	def __init__(self, wave_list, music_file):
+	def __init__(self, wave_list, music_file, background_file):
 		super(Level,self).__init__()
 		# For testing purposes, only load first wave in wave_list
 		self.wave_list = deque(wave_list)
 		self.player = pyglet.media.Player()
 		self.player.eos_action = pyglet.media.Player.EOS_LOOP
 		self.music = pyglet.resource.media(music_file)
+		w, h = director.get_window_size()
+		self.background = cocos.sprite.Sprite(background_file)
+		self.background.opacity = 120
+		self.background.position = w/2, h/2
 		self.player.queue(self.music)
 		self.current_wave = None
 
@@ -252,7 +257,7 @@ def get_levels():
 	wave3 = Wave(vFormationLayout(500), [enemy1, enemy1, nonagon, enemy1, enemy1])
 #	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
 	level1 = get_level1()
-	level2 = Level([wave3], 'Boss.mp3')
+	level2 = Level([wave3], 'Boss.mp3', 'background3.png')
 	levels.append(level1)
 	levels.append(level2)
 
@@ -342,4 +347,4 @@ def get_level1():
 	wave9 = Wave(circularLayout(100), wave9_enemies)
 	level1_waves.append(wave9)
 
-	return Level(level1_waves, 'Level1.mp3')
+	return Level(level1_waves, 'Level1.mp3', 'background1.png')

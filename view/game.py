@@ -8,10 +8,6 @@ class GameView(cocos.layer.ColorLayer):
 		self.model = model
 		pad = 10
 		w, h = cocos.director.director.get_window_size()
-		self.backgrounds = ['background1.png', 'background2.png', 'background3.png']
-		self.bg_image = cocos.sprite.Sprite(self.backgrounds[0])
-		self.bg_image.opacity = 120
-		self.bg_image.position = w/2, h/2
 		self.color = 232, 231, 193
 		size = 16
 		self.lives = cocos.text.Label('Lives: %d' % self.model.player.lives, width=w-pad*2, color=(50, 50, 50, 255), font_name='Orbitron', font_size=size, anchor_x='left', anchor_y='center')
@@ -26,6 +22,7 @@ class GameView(cocos.layer.ColorLayer):
 		self.chain.position = w/2, pad
 
 		self.old_level = None
+		self.old_bg = None
 
 		self.model.push_handlers(self)
 		self.model.player.push_handlers(self)
@@ -38,7 +35,6 @@ class GameView(cocos.layer.ColorLayer):
 		self.add(self.lives, z=10)
 		self.add(self.score, z=10)
 		self.add(self.chain, z=10)
-		self.add(self.bg_image, z=1)
 
 	def on_pause(self):
 		self.add(self.model.pause_menu, z=20)
@@ -49,6 +45,10 @@ class GameView(cocos.layer.ColorLayer):
 	def on_new_level(self):
 		if self.old_level != None:
 			self.remove(self.old_level)
+		if self.old_bg != None:
+			self.remove(self.old_bg)
+		self.add(self.model.current_level.background, z=1)
+		self.old_bg = self.model.current_level.background
 		self.add(self.model.current_level, z=4)
 		self.old_level = self.model.current_level
 	
