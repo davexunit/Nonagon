@@ -24,6 +24,24 @@ class WaveEnemy(object):
 		enemy.do(FadeIn(1))
 		return enemy
 
+class WaveBoss(object):
+	"""This class is a factory for making THE NONAGON!!!1!1!one!
+	"""
+	def __init__(self, action_callback, weapon_callback):
+		self.action_callback = action_callback
+		self.weapon_callback = weapon_callback
+		
+	def make_enemy(self):
+		enemy = game.Nonagon()
+		enemy.weapon = self.weapon_callback(enemy)
+		def do_action(dt):
+			enemy.do(self.action_callback(enemy))
+		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
+		pyglet.clock.schedule_once(do_action, 0)
+		# Fade in because it looks nicer than something just popping into existance
+		enemy.do(FadeIn(1))
+		return enemy
+
 def horizontalLayout(y):
 	"""Accepts a list of enemies and places them in a horizontal line
 	"""
@@ -133,10 +151,12 @@ def get_levels():
 		return game.BasicEnemyWeapon(enemy, 1)
 	enemy1 = WaveEnemy(3, 1, make_action, make_weapon)
 	enemy2 = WaveEnemy(5, 3, make_action, make_weapon)
+	nonagon = WaveBoss(make_action, make_weapon)
 	wave0 = Wave(horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
 	wave1 = Wave(horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
 	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
-	level1 = Level([wave0, wave1, wave2])
+	wave3 = Wave(horizontalLayout(500), [nonagon])
+	level1 = Level([wave3, wave1, wave2, wave3])
 	levels.append(level1)
 
 	return levels

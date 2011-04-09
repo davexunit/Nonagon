@@ -13,9 +13,9 @@ class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
 		super(GameModel, self).__init__()
 
+		# Get levels
 		self.levels = level.get_levels()
 		self.current_level = None
-		
 		# Add the player
 		self.player = Player()
 		self.player.position = 400, 300
@@ -25,7 +25,6 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.enemy_bullets = cocos.batch.BatchNode()
 		# Node for particles
 		self.particles = cocos.cocosnode.CocosNode()
-
 		# Register player event listeners
 		self.player.push_handlers(self)
 
@@ -360,6 +359,7 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		# Maximum number of transforms to expose a kill vertex in the worst case is floor(n / 2)
 		# We're dealing with ints so no need to floor the value
 		self.max_hits = self.num_vertices / 2
+		# Radius of shield
 		self.radius = radius
 		# Sprites that give a visual cue as to whether the kill vertex is exposed or not.
 		self.no = cocos.sprite.Sprite('no.png')
@@ -389,6 +389,8 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	def _set_opacity(self, opacity):
 		self._opacity = opacity
 		self.sprite.opacity = opacity
+		self.no.opacity = opacity
+		self.yes.opacity = opacity
 	opacity = property(_get_opacity, lambda self, opacity: self._set_opacity(opacity))
 	
 	def get_rect(self):
@@ -499,3 +501,13 @@ class EnemyPolygon(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 EnemyPolygon.register_event_type('on_enemy_fire')
 EnemyPolygon.register_event_type('on_enemy_death')
 EnemyPolygon.register_event_type('on_bad_transform')
+
+class Nonagon(EnemyPolygon):
+	"""The big kahuna. The rumble from down under. The brother from another mother. The one, the only: NONAGON!
+	"""
+	def __init__(self):
+		super(Nonagon, self).__init__(9, 5, radius=100, image_file='nonagon_ship.png')
+		self.cackle = pyglet.resource.media('WehHehHeh.mp3', streaming=False)
+	
+	def on_enter(self):
+		self.cackle.play()

@@ -7,6 +7,7 @@ import getmainmenu
 
 # Tell pyglet where our game resources are located
 pyglet.resource.path.append('media/images')
+pyglet.resource.path.append('media/sounds')
 pyglet.resource.reindex()
 pyglet.font.add_directory('media/fonts')
 
