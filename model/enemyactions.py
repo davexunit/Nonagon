@@ -60,10 +60,23 @@ def horizontal_dance(enemy):
     return Repeat(MoveToUnit(1, enemy.y/y_unit) +
                   MoveToUnit(x_grid_size-1, enemy.y/y_unit))
 
+def vertical_dance_bw(enemy):
+    return Repeat(MoveToUnit(enemy.x/x_unit, y_grid_size-1) +
+                  MoveToUnit(enemy.x/x_unit, 1))
+
+def horizontal_dance_bw(enemy):
+    return Repeat(MoveToUnit(x_grid_size-1, enemy.y/y_unit) +
+                  MoveToUnit(1, enemy.y/y_unit))
+
 def top_v(enemy):
     return Repeat(MoveToUnit(1, y_grid_size-1) +
                   MoveTo((w/2, h/2)) +
                   MoveToUnit(x_grid_size-1, y_grid_size-1))
+
+def top_v_bw(enemy):
+    return Repeat(MoveToUnit(x_grid_size-1, y_grid_size-1) +
+                  MoveTo((w/2, h/2)) +
+                  MoveToUnit(1, y_grid_size-1))
 
 def bottom_v(enemy):
     return Repeat(MoveToUnit(x_grid_size-1, 1) +
