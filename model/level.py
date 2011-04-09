@@ -1,6 +1,7 @@
 import pyglet
 import cocos
 from cocos.actions import *
+import math
 import game
 from collections import deque
 
@@ -51,6 +52,32 @@ def horizontalLayout(y):
 		for i, e in enumerate(enemies):
 			e.position = (w / l) * (i + 0.25), y
 	return horizontalLayoutFunc
+
+def circularLayout(radius):
+	"""Accepts a list of enemies and places them in a circle, starting with the top of the circle and going counter-clockwise
+	"""
+	def circularLayoutFunc(enemies):
+		w, h = cocos.director.director.get_window_size()
+		l = len(enemies)
+		for i, e in enumerate(enemies):
+			angle = 2 * math.pi * i / l + math.pi/2
+			e.position = radius * math.cos(angle) + w/2, radius * math.sin(angle) + h/2
+	return circularLayoutFunc
+
+def vFormationLayout(y):
+	"""Accepts a list of enemies and places them in a 'V' formation
+	"""
+	def vFormationLayoutFunc(enemies):
+		w, h = cocos.director.director.get_window_size()
+		l = len(enemies)
+		vertical_offset = -1
+		for i, e in enumerate(enemies):
+			if i < l/2.:
+				vertical_offset += 1
+			elif i > l/2.:
+				vertical_offset -= 1
+			e.position = (w / l) * (i + 0.25), y - vertical_offset*60
+	return vFormationLayoutFunc
 		
 class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 	"""Defines the type of enemies that appear in a level and their behavior.
@@ -83,13 +110,16 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 			enemy.resume_scheduler()
 	
 	def create_wave(self):
+		# Temporary enemy list that respects order
+		temp_enemy_list = []
 		# Create enemies from given data
 		for e in self.enemy_list:
 			enemy = e.make_enemy()
 			enemy.push_handlers(self)
 			self.add(enemy)
+			temp_enemy_list.append(enemy)
 		# Position enemies
-		self.layout_strategy(self.get_children())
+		self.layout_strategy(temp_enemy_list)
 
 	def on_enemy_death(self, enemy):
 		self.remove(enemy)
@@ -204,8 +234,8 @@ def get_levels():
 	enemy1 = WaveEnemy(3, 1, make_action, make_basic_weapon)
 	enemy2 = WaveEnemy(5, 3, make_action, make_sweep_weapon)
 	nonagon = WaveBoss(make_action, make_fan_weapon)
-	wave0 = Wave(horizontalLayout(600), [enemy1, enemy1, enemy1, enemy1])
-	wave1 = Wave(horizontalLayout(500), [enemy1, enemy2, enemy1, enemy2])
+	wave0 = Wave(vFormationLayout(500), [enemy1, enemy1, enemy2, enemy1, enemy1])
+	wave1 = Wave(circularLayout(200), [enemy1, enemy2, enemy1, enemy2, enemy1])
 	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
 	wave3 = Wave(horizontalLayout(500), [nonagon])
 	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
