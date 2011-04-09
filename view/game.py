@@ -1,4 +1,6 @@
+import pyglet
 import cocos
+from cocos.director import director
 
 class GameView(cocos.layer.ColorLayer):
 	def __init__(self, model):
@@ -6,6 +8,11 @@ class GameView(cocos.layer.ColorLayer):
 		self.model = model
 		pad = 10
 		w, h = cocos.director.director.get_window_size()
+		self.backgrounds = ['background1.png', 'background2.png', 'background3.png']
+		self.bg_image = cocos.sprite.Sprite(self.backgrounds[0])
+		self.bg_image.opacity = 120
+		self.bg_image.position = w/2, h/2
+		self.color = 232, 231, 193
 		size = 16
 		self.lives = cocos.text.Label('Lives: %d' % self.model.player.lives, width=w-pad*2, color=(50, 50, 50, 255), font_name='Orbitron', font_size=size, anchor_x='left', anchor_y='center')
 		self.lives.anchor_x = 0
@@ -30,6 +37,7 @@ class GameView(cocos.layer.ColorLayer):
 		self.add(self.lives, z=10)
 		self.add(self.score, z=10)
 		self.add(self.chain, z=10)
+		self.add(self.bg_image, z=1)
 	
 	def on_new_level(self):
 		if self.old_level != None:
