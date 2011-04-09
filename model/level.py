@@ -263,10 +263,12 @@ def get_levels():
 #	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
 	level1 = get_level1()
 	level2 = get_level2()
+	level3 = get_level3()
 #	level2 = Level([wave3], 'Boss.mp3')
-	level3 = Level([wave3], 'Boss.mp3', 'background3.png')
+#	level3 = Level([wave3], 'Boss.mp3', 'background3.png')
 #	levels.append(level1)
-	levels.append(level2)
+#	levels.append(level2)
+	levels.append(level3)
 
 	return levels
 
@@ -277,8 +279,6 @@ def get_level1():
 
 	level1_waves = []
 
-
-
 	# Wave 1
 	wave1_enemies = []
 	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_basic_weapon) )
@@ -286,7 +286,6 @@ def get_level1():
 	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_basic_weapon) )
 	wave1 = Wave(horizontalLayout(500), wave1_enemies)
 	level1_waves.append(wave1)
-
 
 	# Wave 2
 	wave2_enemies = []
@@ -372,7 +371,7 @@ def get_level2():
 	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.small_cw_square, make_basic_weapon) )
 	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.med_cw_square, make_basic_weapon) )
 	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.big_cw_square, make_basic_weapon) )
-	wave1 = Wave(horizontalLayout(500), wave1_enemies)
+	wave1 = Wave(circularLayout(200), wave1_enemies)
 	level2_waves.append(wave1)
 
 
@@ -460,13 +459,12 @@ def get_level3():
 
 	# Wave 1
 	wave1_enemies = []
-	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.big_ccw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.small_cw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.med_cw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(4, 2, enemyactions.big_cw_square, make_basic_weapon) )
-	wave1 = Wave(horizontalLayout(500), wave1_enemies)
-	level3_waves.append(wave1)
 
+	wave1_enemies.append( WaveEnemy(7, 3, enemyactions.small_cw_square, make_fan_weapon) )
+	wave1_enemies.append( WaveBoss(enemyactions.big_ccw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(7, 4, enemyactions.small_ccw_square, make_fan_weapon) )
+	wave1 = Wave(vFormationLayout(500), wave1_enemies)
+	level3_waves.append(wave1)
 
 	# Wave 2
 	wave2_enemies = []
