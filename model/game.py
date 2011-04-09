@@ -101,7 +101,12 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.current_level = self.levels.popleft()
 		self.dispatch_event('on_new_level')
 		self.current_level.push_handlers(self)
+		self.next_wave()
+	
+	def next_wave(self):
 		self.current_level.next_wave()
+		for e in self.current_level.current_wave.get_children():
+			e.push_handlers(self)
 	
 	def on_level_wave_complete(self):
 		# Show wave complete message
@@ -111,12 +116,9 @@ class GameModel(pyglet.event.EventDispatcher):
 			self.message.visible = True
 		def hide():
 			self.message.visible = False
-		self.message.do(CallFunc(show) + Delay(2) + CallFunc(hide))
-		def next_wave():
-			self.current_level.next_wave()
-			for e in self.current_level.current_wave.get_children():
-				e.push_handlers(self)
-		self.current_level.do(Delay(2) + CallFunc(next_wave))
+		delay = 1
+		self.message.do(CallFunc(show) + Delay(delay) + CallFunc(hide))
+		self.current_level.do(Delay(delay) + CallFunc(self.next_wave))
 	
 	def on_level_complete(self):
 		# Show level complete message
@@ -127,8 +129,9 @@ class GameModel(pyglet.event.EventDispatcher):
 			self.message.visible = True
 		def hide():
 			self.message.visible = False
-		self.message.do(CallFunc(show) + Delay(2) + CallFunc(hide))
-		self.current_level.do(Delay(2) + (CallFunc(self.next_level) | CallFunc(self.player.invuln)))
+		delay = 1
+		self.message.do(CallFunc(show) + Delay(delay) + CallFunc(hide))
+		self.current_level.do(Delay(delay) + (CallFunc(self.next_level) | CallFunc(self.player.invuln)))
 
 	def on_lose_life(self, lives):
 		# Make an explosion particle effect
