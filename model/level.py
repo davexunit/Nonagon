@@ -468,25 +468,29 @@ def get_level3():
 
 	# Wave 2
 	wave2_enemies = []
-	wave2_enemies.append( WaveEnemy(5, 3, enemyactions.topleft_to_bottomright, make_basic_weapon) )
-	wave2_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_fan_weapon) )
-	wave2_enemies.append( WaveEnemy(5, 2, enemyactions.topright_to_bottomleft, make_basic_weapon) )
-	wave2 = Wave(verticalLayout(100), wave2_enemies)
+	wave2_enemies.append( WaveEnemy(6, 3, enemyactions.topleft_to_bottomright, make_basic_weapon) )
+	wave2_enemies.append( WaveEnemy(5, 2, enemyactions.horizontal_dance, make_sweep_weapon) )
+	wave2_enemies.append( WaveBoss(enemyactions.vertical_dance, make_basic_weapon) )
+	wave2_enemies.append( WaveEnemy(5, 3, enemyactions.horizontal_dance_bw, make_sweep_weapon) )
+	wave2_enemies.append( WaveEnemy(6, 3, enemyactions.topright_to_bottomleft, make_basic_weapon) )
+	wave2 = Wave(horizontalLayout(400), wave2_enemies)
 	level3_waves.append(wave2)
 
 	# Wave 3
 	wave3_enemies = []
-	wave3_enemies.append( WaveEnemy(6, 2, enemyactions.left_v, make_basic_weapon) )
-	wave3_enemies.append( WaveEnemy(6, 3, enemyactions.top_v, make_sweep_weapon) )
-	wave3_enemies.append( WaveEnemy(6, 4, enemyactions.right_v, make_basic_weapon) )
-	wave3 = Wave(vFormationLayout(500), wave3_enemies)
+	wave3_enemies.append( WaveEnemy(3, 2, enemyactions.left_v, make_fan_weapon) )
+	wave3_enemies.append( WaveBoss(enemyactions.top_v, make_basic_weapon) )
+	wave3_enemies.append( WaveEnemy(4, 2, enemyactions.top_v_bw, make_basic_weapon) )
+	wave3_enemies.append( WaveEnemy(3, 1, enemyactions.right_v, make_fan_weapon) )
+	wave3 = Wave(horizontalLayout(500), wave3_enemies)
 	level3_waves.append(wave3)
 
 	# Wave 4
 	wave4_enemies = []
 	wave4_enemies.append( WaveEnemy(5, 2, enemyactions.horizontal_dance, make_fan_weapon) )
-	wave4_enemies.append( WaveEnemy(6, 2, enemyactions.left_v, make_basic_weapon) )
-	wave4_enemies.append( WaveEnemy(6, 4, enemyactions.vertical_dance, make_basic_weapon) )
+	wave4_enemies.append( WaveEnemy(8, 2, enemyactions.left_v, make_basic_weapon) )
+	wave4_enemies.append( WaveBoss(enemyactions.topleft_to_bottomright, make_basic_weapon) )
+	wave4_enemies.append( WaveEnemy(8, 4, enemyactions.vertical_dance, make_basic_weapon) )
 	wave4_enemies.append( WaveEnemy(5, 3, enemyactions.topright_to_bottomleft, make_fan_weapon) )
 	wave4 = Wave(circularLayout(200), wave4_enemies)
 	level3_waves.append(wave4)
