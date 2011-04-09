@@ -3,6 +3,7 @@ import cocos
 from cocos.actions import *
 import math
 import game
+import enemyactions
 from collections import deque
 
 class WaveEnemy(object):
@@ -50,7 +51,7 @@ def horizontalLayout(y):
 		w, h = cocos.director.director.get_window_size()
 		l = len(enemies)
 		for i, e in enumerate(enemies):
-			e.position = (w / l) * (i + 0.25), y
+			e.position = (w / l) * (i + 0.5), y
 	return horizontalLayoutFunc
 
 def circularLayout(radius):
@@ -217,6 +218,15 @@ def create_enemy_path(enemy, x_dest, y_dest, bend):
 
 	return path
 
+def make_basic_weapon(enemy):
+	return game.BasicEnemyWeapon(enemy, 3, .3, 2)
+
+def make_fan_weapon(enemy):
+	return game.FanEnemyWeapon(enemy, 3, .1, 3)
+
+def make_sweep_weapon(enemy):
+	return game.SweepEnemyWeapon(enemy, 3, .1, 3)
+
 def get_levels():
 	"""Woo hoo we're hardcoding all of our levels here!
 	"""
@@ -225,12 +235,6 @@ def get_levels():
 		path = create_enemy_path(enemy, enemy.x + 100, enemy.y - 150, BEND_UP)
 		action = Bezier(path, 5)
 		return Repeat(action + MoveBy((-100, 150)))
-	def make_basic_weapon(enemy):
-		return game.BasicEnemyWeapon(enemy, 3, .3, 2)
-	def make_fan_weapon(enemy):
-		return game.FanEnemyWeapon(enemy, 3, .1, 3)
-	def make_sweep_weapon(enemy):
-		return game.SweepEnemyWeapon(enemy, 3, .1, 3)
 	enemy1 = WaveEnemy(3, 1, make_action, make_basic_weapon)
 	enemy2 = WaveEnemy(5, 3, make_action, make_sweep_weapon)
 	nonagon = WaveBoss(make_action, make_fan_weapon)
@@ -238,9 +242,48 @@ def get_levels():
 	wave1 = Wave(circularLayout(200), [enemy1, enemy2, enemy1, enemy2, enemy1])
 	wave2 = Wave(horizontalLayout(400), [enemy2, enemy2, enemy2, enemy2])
 	wave3 = Wave(horizontalLayout(500), [nonagon])
-	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
+#	level1 = Level([wave0, wave1, wave2], 'Level1.mp3')
+	level1 = get_level1()
 	level2 = Level([wave3], 'Boss.mp3')
 	levels.append(level1)
 	levels.append(level2)
 
 	return levels
+
+def get_level1():
+	"""Creates and returns level 1.
+	"""
+	w, h = cocos.director.director.get_window_size()
+
+	level1_waves = []
+
+	# Wave 1
+	wave1_enemies = []
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_cw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_basic_weapon) )
+	wave1 = Wave(horizontalLayout(500), wave1_enemies)
+	level1_waves.append(wave1)
+
+
+	# Wave 2
+	wave2_enemies = []
+	wave2_enemies.append( WaveEnemy(4, 3, enemyactions.topleft_to_bottomright, make_basic_weapon) )
+	wave2_enemies.append( WaveEnemy(3, 2, enemyactions.vertical_dance, make_basic_weapon) )
+	wave2_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_basic_weapon) )
+	wave2_enemies.append( WaveEnemy(4, 1, enemyactions.topright_to_bottomleft, make_basic_weapon) )
+	wave2 = Wave(horizontalLayout(500), wave2_enemies)
+	level1_waves.append(wave2)
+
+	# Wave 3
+	wave3_enemies = []
+	wave3_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_basic_weapon) )
+	wave3_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave3_enemies.append( WaveEnemy(4, 2, enemyactions.vertical_dance, make_basic_weapon) )
+	wave3_enemies.append( WaveEnemy(3, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave3 = Wave(vFormationLayout(500), wave3_enemies)
+	level1_waves.append(wave3)
+
+	# Wave 4
+
+	return Level(level1_waves, 'Level1.mp3')
