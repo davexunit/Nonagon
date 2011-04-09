@@ -10,7 +10,7 @@ y_grid_size = 12
 x_unit = w/x_grid_size
 y_unit = h/y_grid_size
 
-def MoveToUnit(x, y, duration=4):
+def MoveToUnit(x, y, duration=5):
     return MoveTo((x*x_unit, y*y_unit), duration)
 
 def square(enemy, border, clockwise=True):
@@ -59,3 +59,23 @@ def vertical_dance(enemy):
 def horizontal_dance(enemy):
     return Repeat(MoveToUnit(1, enemy.y/y_unit) +
                   MoveToUnit(x_grid_size-1, enemy.y/y_unit))
+
+def top_v(enemy):
+    return Repeat(MoveToUnit(1, y_grid_size-1) +
+                  MoveTo((w/2, h/2)) +
+                  MoveToUnit(x_grid_size-1, y_grid_size-1))
+
+def bottom_v(enemy):
+    return Repeat(MoveToUnit(x_grid_size-1, 1) +
+                  MoveTo((w/2, h/2)) +
+                  MoveToUnit(1, 1))
+
+def right_v(enemy):
+    return Repeat(MoveToUnit(x_grid_size-1, y_grid_size-1) +
+                  MoveTo((w/2, h/2)) +
+                  MoveToUnit(x_grid_size-1, 1))
+
+def left_v(enemy):
+    return Repeat(MoveToUnit(1,1) +
+                  MoveTo((w/2, h/2)) +
+                  MoveToUnit(1, y_grid_size-1))
