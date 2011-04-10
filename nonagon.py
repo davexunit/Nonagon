@@ -13,7 +13,7 @@ pyglet.font.add_directory('media/fonts')
 
 # Initialize game window
 director.init(width=800, height=600)
-director.show_FPS = True
+director.show_FPS = False
 
 # Simply start up the game with our main menu scene.
 # If we get far enough we should have a fancy intro scene that comes before the main menu.
