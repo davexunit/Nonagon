@@ -135,7 +135,7 @@ class GameModel(pyglet.event.EventDispatcher):
 
 	def on_lose_life(self, lives):
 		# Make an explosion particle effect
-		p = Explosion()
+		p = ParticleExplosion()
 		p.position = self.player.position
 		self.particles.add(p)
 		# Reset the player to the center of the screen
