@@ -11,13 +11,17 @@ Nonagon is a geometric 2D shoot 'em up. The enemies are regular polygons, with t
 
 The player has two kinds of guns: transformation and damage. The transformation gun is used to change the orientation of enemy polygons, and the damage gun is used to destroy them.
 
-The enemy polygons are oriented so that a single vertex is facing the player. Each polygon has a "killing vertex", and an enemy polygon can only be damaged when this killing vertex is facing the player. The player uses his transformation gun to bring the killing vertex to the front. To make this task more challenging, a player cannot perform the same transformation twice in a row.
+The enemy polygons are oriented so that a single vertex is facing the player. Each polygon has a "killing vertex", and an enemy polygon can only be damaged when this killing vertex is facing the player. The player uses his transformation gun to bring the killing vertex to the front.
 
-When an enemy's killing vertex is facing the player, a shot by the damage gun will kill the enemy. However, shooting the damage gun at an enemy whose killing vertex is not facing the player will merely infuriate the enemy, and cause it retaliate with a storm of projectiles.
+To make this task more challenging, if a player uses the same transformation on the same enemy twice in a row, the enemy activates becomes untransformable for a short time.
 
-The enemy polygons fire projectiles at the player. If these projectiles hit the player, or if the player collides with an enemy polygon, he or she loses a life.
+When an enemy's killing vertex is facing the player, a shot by the damage gun will kill the enemy.
 
-The player wins the game by defeating all enemy polygons. The player loses when he or she runs out of lives.
+The enemy polygons fire volleys of bullets at the player. If the player is hit, they lose a life.
+
+If the player kills 9 polygons without hitting any twice in a row with the same transformation, they gain a life.
+
+The player wins the game by defeating all enemy polygons, including the sinister Nonagon. The player loses when they run out of lives.
 
 Nonagon was created during the April 2011 Pyweek competition. The theme chosen for this competition is "Nine Times".
 
