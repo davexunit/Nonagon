@@ -67,7 +67,7 @@ def verticalLayout(x):
 		w, h = cocos.director.director.get_window_size()
 		l = len(enemies)
 		for i, e in enumerate(enemies):
-			e.position = x, ((h-70) / l) * (i + 0.5) + 70
+			e.position = x, (h-70) / l) * (i + 0.5) + 70
 	return verticalLayoutFunc
 
 def circularLayout(radius):
@@ -338,7 +338,15 @@ def get_level1():
 	wave7 = Wave(horizontalLayout(500), wave7_enemies)
 	level1_waves.append(wave7)
 
-
+	# Wave 8
+	wave8_enemies = []
+	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 3, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_fan_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 1, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8 = Wave(verticalLayout(400), wave8_enemies)
+	level1_waves.append(wave8)
 
 	# Wave 9
 	wave9_enemies = []
