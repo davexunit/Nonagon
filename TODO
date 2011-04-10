@@ -1,11 +1,11 @@
 TODO LIST
 ---------
-[ ] Scrolling Backgrounds for levels
-[ ] Static backgrounds for game over and victory scenes
-[ ] Finish enemy sprites
+[x] Backgrounds for levels
+[ ] Backgrounds for game over and victory scenes
+[x] Finish enemy sprites
 [ ] Instructions screen
 [ ] 2 Levels featuring 9 waves of regular enemies
 [ ] 1 Level featuring 9 waves as a boss fight with Nonagon
-[ ] Incorporate looping music
-[ ] Incorporate sound effects
+[x] Incorporate looping music
+[x] Incorporate sound effects
 [ ] Create a couple more weapon types for enemies to use
