@@ -358,7 +358,7 @@ class Player(cocos.sprite.Sprite):
 	def _set_chain(self, chain):
 		self._chain = chain
 		if self._chain == 9:
-			self.lives += 1
+			self.lives += 9
 			self._chain = 0
 			self.life_sound.play()
 		self.dispatch_event('on_chain_change', self._chain)

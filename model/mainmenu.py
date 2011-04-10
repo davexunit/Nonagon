@@ -38,7 +38,7 @@ class Instructions(cocos.layer.Layer):
 		self.messages.append('Press F to fire a FLIP RIGHT bullet')
 		self.messages.append('Press SPACE to fire a DAMAGE bullet')
 		self.messages.append('Do NOT hit an enemy with same transformation bullet twice in a row!\nThey will be annoyed by this and become un-transformable for a short period of time.')
-		self.messages.append('If you kill 9 enemies without dying or hitting one with the same transformation bullet twice in a row, you will gain an extra life!\nTrust me, you\'ll need it.')
+		self.messages.append('If you kill 9 enemies without dying or hitting one with the same transformation bullet twice in a row, you will gain 9 extra lives!\nTrust me, you\'ll need them.')
 		self.messages.append('GOOD LUCK!')
 		# Create text box
 		pad = 10
