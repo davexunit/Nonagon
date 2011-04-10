@@ -67,7 +67,7 @@ def verticalLayout(x):
 		w, h = cocos.director.director.get_window_size()
 		l = len(enemies)
 		for i, e in enumerate(enemies):
-			e.position = x, (h-70) / l) * (i + 0.5) + 70
+			e.position = x, ((h-70) / l) * (i + 0.5) + 70
 	return verticalLayoutFunc
 
 def circularLayout(radius):
