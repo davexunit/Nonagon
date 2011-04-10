@@ -240,10 +240,10 @@ def make_basic_weapon(enemy):
 	return game.BasicEnemyWeapon(enemy, 3, .3, 2)
 
 def make_fan_weapon(enemy):
-	return game.FanEnemyWeapon(enemy, 3, .1, 3)
+	return game.FanEnemyWeapon(enemy, 3, .5, 4)
 
 def make_sweep_weapon(enemy):
-	return game.SweepEnemyWeapon(enemy, 3, .1, 3)
+	return game.SweepEnemyWeapon(enemy, 2, .2, 4)
 
 def get_levels():
 	"""Woo hoo we're hardcoding all of our levels here!
@@ -281,8 +281,8 @@ def get_level1():
 
 	# Wave 1
 	wave1_enemies = []
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_fan_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_sweep_weapon) )
 	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_basic_weapon) )
 	wave1 = Wave(horizontalLayout(500), wave1_enemies)
 	level1_waves.append(wave1)

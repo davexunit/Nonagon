@@ -249,7 +249,7 @@ class RemoveBoundedMove(cocos.actions.move_actions.Move):
 class Bullet(cocos.sprite.Sprite):
 	"""Provides the functionality to create differing bullet types by using event handlers.
 	"""
-	def __init__(self, image_file, dx=0, dy=500):
+	def __init__(self, image_file, dx=0, dy=400):
 		"""dx and dy parameters set the bullet speed and vector.
 		"""
 		super(Bullet, self).__init__(image_file)
