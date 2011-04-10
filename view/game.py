@@ -38,6 +38,12 @@ class GameView(cocos.layer.ColorLayer):
 		self.add(self.score, z=10)
 		self.add(self.chain, z=10)
 		self.add(self.bg_image, z=1)
+
+	def on_pause(self):
+		self.add(self.model.pause_menu, z=20)
+
+	def on_resume(self):
+		self.remove(self.model.pause_menu)
 	
 	def on_new_level(self):
 		if self.old_level != None:

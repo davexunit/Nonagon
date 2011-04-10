@@ -7,7 +7,7 @@ License:
 GNU General Public License version 3
 
 Description:
-Nonagon is a geometric 2D vertical-scrolling shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator. The player strives to destroy these polygons, but the task requires some geometric trickery.
+Nonagon is a geometric 2D shoot 'em up. The enemies are regular polygons, with the dreaded Nonagon as their dictator. The player strives to destroy these polygons, but the task requires some geometric trickery.
 
 The player has two kinds of guns: transformation and damage. The transformation gun is used to change the orientation of enemy polygons, and the damage gun is used to destroy them.
 
@@ -22,7 +22,7 @@ The player wins the game by defeating all enemy polygons. The player loses when 
 Nonagon was created during the April 2011 Pyweek competition. The theme chosen for this competition is "Nine Times".
 
 Dependencies:
-pyglet, cocos2d
+pyglet, cocos2d, numpy
 
 Running:
 python game.py
@@ -31,9 +31,9 @@ python game.py
 Controls:
 Move spaceship			Arrow keys
 Fire transformation gun:
-  Rotate counter-clockwise	A
-  Rotate clockwise		S
-  Flip about line L		Q
-  Flip about line R		W
-Fire damage gun:  		D
-Pause game			Enter
+  Rotate clockwise			A	
+  Rotate counter-clockwise	S
+  Flip about line L			D
+  Flip about line R			F
+Fire damage gun:  			SPACE
+Pause game					ENTER

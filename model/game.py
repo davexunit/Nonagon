@@ -4,10 +4,12 @@ import cocos
 from cocos.director import director
 from cocos.actions import *
 from cocos.particle_systems import Explosion
+from cocos.menu import *
 import math
 import random
 from collections import deque
 import level
+from view.mainmenu import paddedVerticalLayout
 
 class GameModel(pyglet.event.EventDispatcher):
 	def __init__(self):
@@ -29,6 +31,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.player.push_handlers(self)
 		# Paused flag
 		self.paused = False
+		self.pause_menu = PauseMenu(self)
 
 	def pause(self):
 		if not self.paused:
@@ -151,6 +154,35 @@ class GameModel(pyglet.event.EventDispatcher):
 					b.on_hit(self.player)
 					self.enemy_bullets.remove(b)
 					return
+
+class PauseMenu(Menu):
+	"""The pause menu.
+	"""
+	def __init__(self, model):
+		super(PauseMenu, self).__init__('PAUSED')
+		self.model = model
+		# Menu item font properties
+		self.font_title['font_name'] = 'Orbitron'
+		self.font_title['color'] = (0, 0, 0, 255)
+		self.font_item['font_name'] = 'Orbitron'
+		self.font_item['color'] = (0, 0, 0, 255)
+		self.font_item_selected['font_name'] = 'Orbitron'
+		self.font_item_selected['color'] = (50, 50, 50, 255)
+		# Create the menu items
+		items = []
+		items.append(MenuItem('Resume', self.on_resume))
+		items.append(MenuItem('Quit', self.on_quit))
+
+		# Finalize the menu
+		self.create_menu(items, layout_strategy=paddedVerticalLayout(10))
+	
+	def on_resume(self):
+		self.model.resume()
+	
+	def on_quit(self):
+		# Pop this scene off of the scene stack.
+		self.model.current_level.player.pause()
+		director.pop()
 
 GameModel.register_event_type('on_new_level')
 GameModel.register_event_type('on_pause')

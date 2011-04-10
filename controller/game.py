@@ -10,14 +10,12 @@ class GameController(cocos.layer.Layer):
 		self.model = model
 		self.schedule(self.step)
 		
-		# Weapon key assignments; QWERTY for now
+		# Weapon key assignments
 		self.rotate_cw = key.A
 		self.rotate_ccw = key.S
 		self.flip_l = key.D
 		self.flip_r = key.F
 		self.fire_key = key.SPACE
-
-		self.last_transf = ''
 
 	def on_key_press(self, symbol, modifiers):
 		if not self.model.paused:
@@ -39,13 +37,7 @@ class GameController(cocos.layer.Layer):
 				self.model.player.fire(FlipRightBullet())
 			elif symbol == self.fire_key:
 				self.start_fire()
-		if symbol == key.ESCAPE:
-			cocos.director.director.pop()
-			self.model.current_level.player.pause()
-		elif symbol == key.ENTER:
-			if self.model.paused:
-				self.model.resume()
-			else:
+			elif symbol == key.ENTER:
 				self.model.pause()
 		return True
 	
