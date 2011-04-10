@@ -138,6 +138,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		p = ParticleExplosion()
 		p.position = self.player.position
 		self.particles.add(p)
+		p.do(Delay(5) + CallFunc(p.kill))
 		# Reset the player to the center of the screen
 		w, h = director.get_window_size()
 		self.player.position = w/2, h/2
@@ -161,6 +162,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		p = ParticleExplosion()
 		p.position = enemy.position
 		self.particles.add(p)
+		p.do(Delay(5) + CallFunc(p.kill))
 
 	def on_player_fire(self, bullet):
 		self.player_bullets.add(bullet)
@@ -249,7 +251,7 @@ class RemoveBoundedMove(cocos.actions.move_actions.Move):
 class Bullet(cocos.sprite.Sprite):
 	"""Provides the functionality to create differing bullet types by using event handlers.
 	"""
-	def __init__(self, image_file, dx=0, dy=500):
+	def __init__(self, image_file, dx=0, dy=600):
 		"""dx and dy parameters set the bullet speed and vector.
 		"""
 		super(Bullet, self).__init__(image_file)
@@ -320,7 +322,7 @@ class KillBullet(Bullet):
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
 	"""
-	def __init__(self, dx=0, dy=-300):
+	def __init__(self, dx=0, dy=-250):
 		super(EnemyBullet, self).__init__('enemy_bullet.png', dx, dy)
 	
 	def on_hit(self, entity):
@@ -356,7 +358,7 @@ class Player(cocos.sprite.Sprite):
 	def _set_chain(self, chain):
 		self._chain = chain
 		if self._chain == 9:
-			self.lives += 1
+			self.lives += 9
 			self._chain = 0
 			self.life_sound.play()
 		self.dispatch_event('on_chain_change', self._chain)

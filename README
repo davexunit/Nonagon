@@ -15,11 +15,11 @@ The enemy polygons are oriented so that a single vertex is facing the player. Ea
 
 To make this task more challenging, if a player uses the same transformation on the same enemy twice in a row, the enemy activates becomes untransformable for a short time.
 
-When an enemy's killing vertex is facing the player, a shot by the damage gun will kill the enemy.
+When an enemy's kill vertex is facing the player, a shot by the damage gun will kill the enemy.
 
 The enemy polygons fire volleys of bullets at the player. If the player is hit, they lose a life.
 
-If the player kills 9 polygons without hitting any twice in a row with the same transformation, they gain a life.
+If the player kills nine polygons without hitting any twice in a row with the same transformation, they gain nine lives.
 
 The player wins the game by defeating all enemy polygons, including the sinister Nonagon. The player loses when they run out of lives.
 

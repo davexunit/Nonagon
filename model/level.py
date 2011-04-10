@@ -240,10 +240,10 @@ def make_basic_weapon(enemy):
 	return game.BasicEnemyWeapon(enemy, 3, .3, 2)
 
 def make_fan_weapon(enemy):
-	return game.FanEnemyWeapon(enemy, 3, .1, 3)
+	return game.FanEnemyWeapon(enemy, 3, .5, 4)
 
 def make_sweep_weapon(enemy):
-	return game.SweepEnemyWeapon(enemy, 3, .1, 3)
+	return game.SweepEnemyWeapon(enemy, 2, .2, 4)
 
 def get_levels():
 	"""Woo hoo we're hardcoding all of our levels here!
@@ -281,8 +281,8 @@ def get_level1():
 
 	# Wave 1
 	wave1_enemies = []
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_basic_weapon) )
-	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_basic_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.big_ccw_square, make_fan_weapon) )
+	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.small_cw_square, make_sweep_weapon) )
 	wave1_enemies.append( WaveEnemy(3, 1, enemyactions.med_cw_square, make_basic_weapon) )
 	wave1 = Wave(horizontalLayout(500), wave1_enemies)
 	level1_waves.append(wave1)
@@ -338,7 +338,15 @@ def get_level1():
 	wave7 = Wave(horizontalLayout(500), wave7_enemies)
 	level1_waves.append(wave7)
 
-
+	# Wave 8
+	wave8_enemies = []
+	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 3, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_fan_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 1, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
+	wave8 = Wave(verticalLayout(400), wave8_enemies)
+	level1_waves.append(wave8)
 
 	# Wave 9
 	wave9_enemies = []
