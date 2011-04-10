@@ -249,7 +249,7 @@ class RemoveBoundedMove(cocos.actions.move_actions.Move):
 class Bullet(cocos.sprite.Sprite):
 	"""Provides the functionality to create differing bullet types by using event handlers.
 	"""
-	def __init__(self, image_file, dx=0, dy=400):
+	def __init__(self, image_file, dx=0, dy=600):
 		"""dx and dy parameters set the bullet speed and vector.
 		"""
 		super(Bullet, self).__init__(image_file)
@@ -320,7 +320,7 @@ class KillBullet(Bullet):
 class EnemyBullet(Bullet):
 	"""Enemies fire these. Go figure.
 	"""
-	def __init__(self, dx=0, dy=-300):
+	def __init__(self, dx=0, dy=-250):
 		super(EnemyBullet, self).__init__('enemy_bullet.png', dx, dy)
 	
 	def on_hit(self, entity):
