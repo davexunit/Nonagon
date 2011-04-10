@@ -46,7 +46,7 @@ class WaveBoss(object):
 			enemy.do(self.action_callback(enemy))
 		# This is a hack to start the action on the next frame so that the action is set AFTER the layout strategy has positioned the enemies
 		pyglet.clock.schedule_once(do_action, 0)
-		# Fade in because it looks nicer than something just popping into existance
+	# Fade in because it looks nicer than something just popping into existance
 		enemy.do(FadeIn(2))
 		return enemy
 
@@ -67,7 +67,7 @@ def verticalLayout(x):
 		w, h = cocos.director.director.get_window_size()
 		l = len(enemies)
 		for i, e in enumerate(enemies):
-			e.position = x, (h / l) * (i + 1)
+			e.position = x, ((h-70) / l) * (i + 0.5) + 70
 	return verticalLayoutFunc
 
 def circularLayout(radius):
@@ -338,15 +338,7 @@ def get_level1():
 	wave7 = Wave(horizontalLayout(500), wave7_enemies)
 	level1_waves.append(wave7)
 
-	# Wave 8
-	wave8_enemies = []
-	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
-	wave8_enemies.append( WaveEnemy(4, 3, enemyactions.horizontal_dance, make_basic_weapon) )
-	wave8_enemies.append( WaveEnemy(3, 1, enemyactions.vertical_dance, make_fan_weapon) )
-	wave8_enemies.append( WaveEnemy(4, 1, enemyactions.horizontal_dance, make_basic_weapon) )
-	wave8_enemies.append( WaveEnemy(4, 2, enemyactions.horizontal_dance, make_basic_weapon) )
-	wave8 = Wave(verticalLayout(400), wave8_enemies)
-	level1_waves.append(wave8)
+
 
 	# Wave 9
 	wave9_enemies = []
