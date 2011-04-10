@@ -29,11 +29,11 @@ python game.py
 (For now, we'll need to actually package this before the end of Pyweek. :P)
 
 Controls:
-Move spaceship			Arrow keys
-Fire transformation gun:
-  Rotate clockwise			A	
-  Rotate counter-clockwise	S
-  Flip about line L			D
-  Flip about line R			F
-Fire damage gun:  			SPACE
-Pause game					ENTER
+Move                         UP, DOWN, LEFT, RIGHT
+Gun:
+  Rotate clockwise           A	
+  Rotate counter-clockwise   S
+  Flip about line L          D
+  Flip about line R          F
+  Fire regular bullet        SPACE
+Pause                        ENTER
