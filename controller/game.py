@@ -20,27 +20,33 @@ class GameController(cocos.layer.Layer):
 		self.last_transf = ''
 
 	def on_key_press(self, symbol, modifiers):
-		if symbol == key.LEFT:
-			self.model.player.move(Player.MOVE_LEFT)
-		elif symbol == key.RIGHT:
-			self.model.player.move(Player.MOVE_RIGHT)
-		elif symbol == key.UP:
-			self.model.player.move(Player.MOVE_UP)
-		elif symbol == key.DOWN:
-			self.model.player.move(Player.MOVE_DOWN)
-		elif symbol == self.rotate_ccw:
-			self.model.player.fire(RotateCCWBullet())
-		elif symbol == self.rotate_cw:
-			self.model.player.fire(RotateCWBullet())
-		elif symbol == self.flip_l:
-			self.model.player.fire(FlipLeftBullet())
-		elif symbol == self.flip_r:
-			self.model.player.fire(FlipRightBullet())
-		elif symbol == self.fire_key:
-			self.start_fire()
-		elif symbol == key.ESCAPE:
+		if not self.model.paused:
+			if symbol == key.LEFT:
+				self.model.player.move(Player.MOVE_LEFT)
+			elif symbol == key.RIGHT:
+				self.model.player.move(Player.MOVE_RIGHT)
+			elif symbol == key.UP:
+				self.model.player.move(Player.MOVE_UP)
+			elif symbol == key.DOWN:
+				self.model.player.move(Player.MOVE_DOWN)
+			elif symbol == self.rotate_ccw:
+				self.model.player.fire(RotateCCWBullet())
+			elif symbol == self.rotate_cw:
+				self.model.player.fire(RotateCWBullet())
+			elif symbol == self.flip_l:
+				self.model.player.fire(FlipLeftBullet())
+			elif symbol == self.flip_r:
+				self.model.player.fire(FlipRightBullet())
+			elif symbol == self.fire_key:
+				self.start_fire()
+		if symbol == key.ESCAPE:
 			cocos.director.director.pop()
 			self.model.current_level.player.pause()
+		elif symbol == key.ENTER:
+			if self.model.paused:
+				self.model.resume()
+			else:
+				self.model.pause()
 		return True
 	
 	def on_key_release(self, symbol, modifiers):

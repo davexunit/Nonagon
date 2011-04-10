@@ -27,6 +27,56 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.particles = cocos.cocosnode.CocosNode()
 		# Register player event listeners
 		self.player.push_handlers(self)
+		# Paused flag
+		self.paused = False
+
+	def pause(self):
+		if not self.paused:
+			self.paused = True
+			self.dispatch_event('on_pause')
+			self.player.pause_scheduler()
+			self.player.pause()
+			self.player_bullets.pause_scheduler()
+			self.player_bullets.pause()
+			for b in self.player_bullets.get_children():
+				b.pause()
+				b.pause_scheduler()
+			self.enemy_bullets.pause_scheduler()
+			self.enemy_bullets.pause()
+			for b in self.enemy_bullets.get_children():
+				b.pause()
+				b.pause_scheduler()
+			self.current_level.pause_scheduler()
+			self.current_level.pause()
+			self.particles.pause_scheduler()
+			self.particles.pause()
+			for p in self.particles.get_children():
+				p.pause()
+				p.pause_scheduler()
+
+	def resume(self):
+		if self.paused:
+			self.paused = False
+			self.dispatch_event('on_resume')
+			self.player.resume_scheduler()
+			self.player.resume()
+			self.player_bullets.resume_scheduler()
+			self.player_bullets.resume()
+			for b in self.player_bullets.get_children():
+				b.resume()
+				b.resume_scheduler()
+			self.enemy_bullets.resume_scheduler()
+			self.enemy_bullets.resume()
+			for b in self.enemy_bullets.get_children():
+				b.resume()
+				b.resume_scheduler()
+			self.current_level.resume_scheduler()
+			self.current_level.resume()
+			self.particles.resume_scheduler()
+			self.particles.resume()
+			for p in self.particles.get_children():
+				p.resume()
+				p.resume_scheduler()
 
 	def next_level(self):
 		# No levels left? WE HAVE A WINRAR!
@@ -103,6 +153,8 @@ class GameModel(pyglet.event.EventDispatcher):
 					return
 
 GameModel.register_event_type('on_new_level')
+GameModel.register_event_type('on_pause')
+GameModel.register_event_type('on_resume')
 
 class RemoveBoundedMove(cocos.actions.move_actions.Move):
 	"""Move the target but remove it from the parent when it reaches certain bounds.

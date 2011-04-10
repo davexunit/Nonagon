@@ -61,6 +61,26 @@ class Wave(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		super(Wave, self).__init__()
 		self.layout_strategy = layout_strategy
 		self.enemy_list = list(enemy_list)
+
+	def pause(self):
+		super(Wave, self).pause()
+		for enemy in self.get_children():
+			enemy.pause()
+
+	def pause_scheduler(self):
+		super(Wave, self).pause_scheduler()
+		for enemy in self.get_children():
+			enemy.pause_scheduler()
+
+	def resume(self):
+		super(Wave, self).resume()
+		for enemy in self.get_children():
+			enemy.resume()
+
+	def resume_scheduler(self):
+		super(Wave, self).resume_scheduler()
+		for enemy in self.get_children():
+			enemy.resume_scheduler()
 	
 	def create_wave(self):
 		# Create enemies from given data
@@ -90,6 +110,27 @@ class Level(cocos.cocosnode.CocosNode, pyglet.event.EventDispatcher):
 		self.player.eos_action = pyglet.media.Player.EOS_LOOP
 		self.music = pyglet.resource.media(music_file)
 		self.player.queue(self.music)
+		self.current_wave = None
+
+	def pause(self):
+		super(Level, self).pause()
+		if self.current_wave != None:
+			self.current_wave.pause()
+
+	def pause_scheduler(self):
+		super(Level, self).pause_scheduler()
+		if self.current_wave != None:
+			self.current_wave.pause_scheduler()
+
+	def resume(self):
+		super(Level, self).resume()
+		if self.current_wave != None:
+			self.current_wave.resume()
+
+	def resume_scheduler(self):
+		super(Level, self).resume_scheduler()
+		if self.current_wave != None:
+			self.current_wave.resume_scheduler()
 	
 	def next_wave(self):
 		if not self.player.playing:
