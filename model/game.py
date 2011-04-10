@@ -135,25 +135,26 @@ class GameModel(pyglet.event.EventDispatcher):
 		self.enemy_bullets.add(bullet)
 
 	def step(self, dt):
-		"""Called every frame, this method updates objects that have time dependent calculations to perform.
+		"""Checks for collisions.
 		"""
-		# Some inefficient naive collision detection
-		for b in self.player_bullets.get_children():
-			for e in self.current_level.current_wave.get_children():
-				if b.get_rect().intersects(e.get_rect()):
-					b.on_hit(e)
-					self.player_bullets.remove(b)
-					return
-		if not self.player.no_clip:
-			for e in self.current_level.current_wave.get_children():
-				if self.player.get_rect().intersects(e.get_rect()):
-					self.player.on_hit()
-					return
-			for b in self.enemy_bullets.get_children():
-				if b.get_rect().intersects(self.player.get_rect()):
-					b.on_hit(self.player)
-					self.enemy_bullets.remove(b)
-					return
+		if not self.paused:
+			# Some inefficient naive collision detection
+			for b in self.player_bullets.get_children():
+				for e in self.current_level.current_wave.get_children():
+					if b.get_rect().intersects(e.get_rect()):
+						b.on_hit(e)
+						self.player_bullets.remove(b)
+						return
+			if not self.player.no_clip:
+				for e in self.current_level.current_wave.get_children():
+					if self.player.get_rect().intersects(e.get_rect()):
+						self.player.on_hit()
+						return
+				for b in self.enemy_bullets.get_children():
+					if b.get_rect().intersects(self.player.get_rect()):
+						b.on_hit(self.player)
+						self.enemy_bullets.remove(b)
+						return
 
 class PauseMenu(Menu):
 	"""The pause menu.
