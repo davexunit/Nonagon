@@ -138,6 +138,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		p = Explosion()
 		p.position = self.player.position
 		self.particles.add(p)
+		p.do(Delay(5) + CallFunc(p.kill))
 		# Reset the player to the center of the screen
 		w, h = director.get_window_size()
 		self.player.position = w/2, h/2
@@ -161,6 +162,7 @@ class GameModel(pyglet.event.EventDispatcher):
 		p = ParticleExplosion()
 		p.position = enemy.position
 		self.particles.add(p)
+		p.do(Delay(5) + CallFunc(p.kill))
 
 	def on_player_fire(self, bullet):
 		self.player_bullets.add(bullet)
