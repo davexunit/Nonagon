@@ -1,11 +1,8 @@
 TODO LIST
 ---------
-[x] Backgrounds for levels
-[ ] Backgrounds for game over and victory scenes
-[x] Finish enemy sprites
-[ ] Instructions screen
-[ ] 2 Levels featuring 9 waves of regular enemies
-[ ] 1 Level featuring 9 waves as a boss fight with Nonagon
-[x] Incorporate looping music
-[x] Incorporate sound effects
-[ ] Create a couple more weapon types for enemies to use
+[ ] Fix Instructions screen not being able to be viewed a second time
+[ ] Upon wave completion, clear all enemy and player bullets
+[ ] General code refactoring
+[ ] More weapons
+[ ] Tweak level design
+[ ] Make .deb package
